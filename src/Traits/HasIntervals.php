@@ -110,6 +110,21 @@ trait HasIntervals
     }
 
     /**
+     * Set the limit to be released every week
+     *
+     * @return $this
+     */
+    public function untilEndOfMonth(): static
+    {
+        $sundayTimestamp = (new DateTimeImmutable('last day of this month 23:59'))->getTimestamp();
+
+        return $this->everySeconds(
+            seconds: $sundayTimestamp - $this->getCurrentTimestamp(),
+            timeToLiveKey: 'end_of_month'
+        );
+    }
+
+    /**
      * Set the limit to be released every day
      *
      * @return $this
