@@ -20,7 +20,9 @@
         "pestphp/pest": "^1.21",
         "phpstan/phpstan": "^1.9",
         "spatie/ray": "^1.33",
-        "predis/predis": "^2.1"
+        "predis/predis": "^2.1",
+        "psr/simple-cache": "^3.0",
+        "ext-redis": "*"
     },
     "minimum-stability": "stable",
     "autoload": {
