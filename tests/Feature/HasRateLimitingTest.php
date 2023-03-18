@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
+use Saloon\RateLimiter\Tests\Fixtures\Requests\UserRequest;
 use Saloon\RateLimiter\Tests\Fixtures\Connectors\FileConnector;
 use Saloon\RateLimiter\Tests\Fixtures\Connectors\PredisConnector;
-use Saloon\RateLimiter\Tests\Fixtures\Requests\UserRequest;
 
 test('it works with predis connector', function () {
     $connector = new PredisConnector;

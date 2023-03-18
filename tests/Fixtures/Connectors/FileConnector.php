@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
-use Predis\Client;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
-use Saloon\RateLimiter\HasRateLimiting;
 use Saloon\RateLimiter\Limit;
+use Saloon\RateLimiter\HasRateLimiting;
 use Saloon\RateLimiter\Stores\FileStore;
-use Saloon\RateLimiter\Stores\PredisStore;
+use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
 final class FileConnector extends Connector
 {

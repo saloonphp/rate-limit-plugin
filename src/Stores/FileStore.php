@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Saloon\RateLimiter\Stores;
 
+use Throwable;
 use Saloon\Helpers\Storage;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
-use Throwable;
 
 class FileStore implements RateLimiterStore
 {
@@ -13,7 +15,7 @@ class FileStore implements RateLimiterStore
      *
      * @var \Saloon\Helpers\Storage
      */
-    readonly protected Storage $storage;
+    protected readonly Storage $storage;
 
     /**
      * Constructor
