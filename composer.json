@@ -12,13 +12,15 @@
     ],
     "homepage": "https://github.com/sammyjo20",
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "sammyjo20/saloon": "^2.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.5",
         "pestphp/pest": "^1.21",
         "phpstan/phpstan": "^1.9",
-        "spatie/ray": "^1.33"
+        "spatie/ray": "^1.33",
+        "predis/predis": "^2.1"
     },
     "minimum-stability": "stable",
     "autoload": {
