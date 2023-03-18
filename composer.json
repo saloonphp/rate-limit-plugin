@@ -1,6 +1,6 @@
 {
-    "name": "sammyjo20/package-template",
-    "description": "Description",
+    "name": "sammyjo20/saloon-rate-limiter-plugin",
+    "description": "Adds support for rate limiting in your Saloon integration",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -23,8 +23,8 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "Sammyjo20\\Package\\": "src/",
-            "Sammyjo20\\Package\\Tests\\": "tests/"
+            "Saloon\\RateLimiter\\": "src/",
+            "Saloon\\RateLimiter\\Tests\\": "tests/"
         }
     },
     "config": {
