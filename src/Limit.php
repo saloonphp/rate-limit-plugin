@@ -86,7 +86,7 @@ class Limit
      * @param float $threshold
      * @param callable|null $responseHandler
      */
-    public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
+    final public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
     {
         $this->allow = $allow;
         $this->threshold = $threshold;
@@ -102,7 +102,7 @@ class Limit
      */
     public static function allow(int $requests, float $threshold = 1): static
     {
-        return new self($requests, $threshold);
+        return new static($requests, $threshold);
     }
 
     /**
@@ -113,7 +113,7 @@ class Limit
      */
     public static function fromResponse(callable $onResponse): static
     {
-        return (new self(1, 1, $onResponse(...)))->everySeconds(120, 'response');
+        return (new static(1, 1, $onResponse(...)))->everySeconds(120, 'response');
     }
 
     /**
@@ -151,10 +151,10 @@ class Limit
     /**
      * Set the limit as exceeded
      *
-     * @param $releaseInSeconds
+     * @param int|null $releaseInSeconds
      * @return void
      */
-    public function exceeded($releaseInSeconds = null): void
+    public function exceeded(int $releaseInSeconds = null): void
     {
         $this->exceeded = true;
 
@@ -191,7 +191,7 @@ class Limit
      * @param string|null $name
      * @return $this
      */
-    public function name(?string $name): Limit
+    public function name(?string $name): static
     {
         $this->name = $name;
 
@@ -205,7 +205,7 @@ class Limit
      * @return $this
      * @throws \ReflectionException
      */
-    public function setObjectName(Connector|Request $object): Limit
+    public function setObjectName(Connector|Request $object): static
     {
         $this->objectName = (new ReflectionClass($object::class))->getShortName();
 
@@ -226,7 +226,7 @@ class Limit
      * Set the expiry timestamp
      *
      * @param int|null $expiryTimestamp
-     * @return Limit
+     * @return $this
      */
     public function setExpiryTimestamp(?int $expiryTimestamp): static
     {
