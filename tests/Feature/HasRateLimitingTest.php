@@ -65,3 +65,11 @@ test('it works with psr connector', function () {
 
     // dd($response->json());
 });
+
+test('it works on a request', function () {
+    //
+});
+
+test('it works on a solo request', function () {
+    //
+});

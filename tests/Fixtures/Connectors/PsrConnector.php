@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
-use Predis\Client;
 use Psr\SimpleCache\CacheInterface;
-use Redis;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\HasRateLimiting;
-use Saloon\RateLimiter\Stores\PredisStore;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimiter\Limit;
 use Saloon\RateLimiter\Stores\PsrStore;
-use Saloon\RateLimiter\Stores\RedisStore;
 use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
+use Saloon\RateLimiter\Traits\HasRateLimiting;
 
 final class PsrConnector extends Connector
 {

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
-use Predis\Client;
 use Redis;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\HasRateLimiting;
-use Saloon\RateLimiter\Stores\PredisStore;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimiter\Limit;
 use Saloon\RateLimiter\Stores\RedisStore;
+use Saloon\RateLimiter\Traits\HasRateLimiting;
 
 final class RedisConnector extends Connector
 {
@@ -26,12 +24,14 @@ final class RedisConnector extends Connector
      * Resolve the limits
      *
      * @return array
+     * @throws \Exception
      */
     protected function resolveLimits(): array
     {
         return [
             Limit::allow(10)->everyMinute(),
             Limit::allow(20)->everyHour(),
+            Limit::allow(20)->everyDayUntil('10:30pm'),
         ];
     }
 

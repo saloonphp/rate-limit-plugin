@@ -6,10 +6,10 @@ namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
 use Predis\Client;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\HasRateLimiting;
-use Saloon\RateLimiter\Stores\PredisStore;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimiter\Limit;
+use Saloon\RateLimiter\Stores\PredisStore;
+use Saloon\RateLimiter\Traits\HasRateLimiting;
 
 final class PredisConnector extends Connector
 {

@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter;
+namespace Saloon\RateLimiter\Traits;
 
-use Saloon\Contracts\Response;
 use Saloon\Contracts\PendingRequest;
-use Saloon\RateLimiter\Helpers\LimitHelper;
+use Saloon\Contracts\Response;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
+use Saloon\RateLimiter\Helpers\LimitHelper;
+use Saloon\RateLimiter\Limit;
 
 trait HasRateLimiting
 {
