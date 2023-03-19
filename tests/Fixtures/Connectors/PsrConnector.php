@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
-use Psr\SimpleCache\CacheInterface;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
 use Saloon\RateLimiter\Limit;
+use Psr\SimpleCache\CacheInterface;
 use Saloon\RateLimiter\Stores\PsrStore;
-use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
+use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
 
 final class PsrConnector extends Connector
 {
     use HasRateLimiting;
 
-    readonly public CacheInterface $cache;
+    public readonly CacheInterface $cache;
 
     public function __construct()
     {

@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
 use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\Stores\FileStore;
 use Saloon\RateLimiter\Stores\PsrStore;
-use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
+use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
 
 final class WaitConnector extends Connector
 {
     use HasRateLimiting;
 
-    readonly public ArrayPsrCache $cache;
+    public readonly ArrayPsrCache $cache;
 
     public function __construct()
     {

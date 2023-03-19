@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Saloon\RateLimiter\Traits;
 
 use DateTimeImmutable;
-use InvalidArgumentException;
 use Saloon\Helpers\Date;
-use Saloon\Helpers\Str;
 
 trait HasIntervals
 {

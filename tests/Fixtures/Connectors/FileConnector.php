@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
 use Saloon\RateLimiter\Limit;
 use Saloon\RateLimiter\Stores\FileStore;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
+use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
 final class FileConnector extends Connector
 {

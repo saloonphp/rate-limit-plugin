@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-use Saloon\Helpers\Storage;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
-use Saloon\RateLimiter\Tests\Fixtures\Connectors\FromTooManyAttemptsConnector;
-use Saloon\RateLimiter\Tests\Fixtures\Connectors\WaitConnector;
 use Saloon\RateLimiter\Tests\Fixtures\Requests\UserRequest;
+use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
+use Saloon\RateLimiter\Tests\Fixtures\Connectors\WaitConnector;
+use Saloon\RateLimiter\Tests\Fixtures\Connectors\FromTooManyAttemptsConnector;
 
 test('when making a request with the HasRateLimiting trait added it will record the hits and throw exceptions', function () {
-
 });
 
 test('it works on a request', function () {
