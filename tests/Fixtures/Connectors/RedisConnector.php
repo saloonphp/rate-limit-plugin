@@ -31,8 +31,7 @@ final class RedisConnector extends Connector
         return [
             Limit::allow(10)->everyMinute(),
             Limit::allow(20)->everyHour(),
-            Limit::allow(20)->everyDayUntil('10:30pm'),
-            Limit::allow(20)->untilEndOfMonth(),
+            Limit::allow(100)->everyDayUntil('10:30pm'),
         ];
     }
 

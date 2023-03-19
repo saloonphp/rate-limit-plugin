@@ -117,6 +117,21 @@ class Limit
     }
 
     /**
+     * Detect when the response has a status of 429 and release by the number of seconds
+     *
+     * @param int $releaseInSeconds
+     * @return static
+     */
+    public static function fromTooManyRequests(int $releaseInSeconds): static
+    {
+        return static::fromResponse(static function (Response $response, Limit $limit) use ($releaseInSeconds) {
+            if ($response->status() === 429) {
+                $limit->exceeded($releaseInSeconds);
+            }
+        });
+    }
+
+    /**
      * Check if the limit has been reached
      *
      * @param float|null $threshold
@@ -141,7 +156,7 @@ class Limit
      */
     public function hit(int $amount = 1): static
     {
-        if (! $this->hasExceeded()) {
+        if (! $this->wasManuallyExceeded()) {
             $this->hits += $amount;
         }
 
@@ -271,7 +286,7 @@ class Limit
      *
      * @return bool
      */
-    public function hasExceeded(): bool
+    public function wasManuallyExceeded(): bool
     {
         return $this->exceeded;
     }

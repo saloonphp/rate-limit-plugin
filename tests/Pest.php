@@ -40,3 +40,12 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+function decodeStoreData(?string $data): ?array
+{
+    if (empty($data)) {
+        return null;
+    }
+
+    return json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+}
