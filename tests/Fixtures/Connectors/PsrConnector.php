@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
-use Predis\Client;
 use Saloon\Http\Connector;
 use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\Stores\PredisStore;
+use Psr\SimpleCache\CacheInterface;
+use Saloon\RateLimiter\Stores\PsrStore;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
 
-final class PredisConnector extends Connector
+final class PsrConnector extends Connector
 {
     use HasRateLimiting;
+
+    public readonly CacheInterface $cache;
+
+    public function __construct()
+    {
+        $this->cache = new ArrayPsrCache;
+    }
 
     public function resolveBaseUrl(): string
     {
@@ -40,6 +48,6 @@ final class PredisConnector extends Connector
      */
     protected function resolveRateLimiterStore(): RateLimiterStore
     {
-        return new PredisStore(new Client);
+        return new PsrStore($this->cache);
     }
 }

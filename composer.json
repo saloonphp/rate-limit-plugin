@@ -1,6 +1,6 @@
 {
     "name": "sammyjo20/saloon-rate-limiter-plugin",
-    "description": "Adds support for rate limiting in your Saloon integration",
+    "description": "Adds support for rate limiting in your Saloon integration or SDK",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -16,11 +16,13 @@
         "sammyjo20/saloon": "^2.4"
     },
     "require-dev": {
+        "ext-redis": "*",
         "friendsofphp/php-cs-fixer": "^3.5",
         "pestphp/pest": "^1.21",
         "phpstan/phpstan": "^1.9",
-        "spatie/ray": "^1.33",
-        "predis/predis": "^2.1"
+        "predis/predis": "^2.1",
+        "psr/simple-cache": "^3.0",
+        "spatie/ray": "^1.33"
     },
     "minimum-stability": "stable",
     "autoload": {

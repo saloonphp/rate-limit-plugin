@@ -6,8 +6,8 @@ namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
 use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\HasRateLimiting;
 use Saloon\RateLimiter\Stores\FileStore;
+use Saloon\RateLimiter\Traits\HasRateLimiting;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
 final class FileConnector extends Connector

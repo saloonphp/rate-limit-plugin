@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter;
+namespace Saloon\RateLimiter\Traits;
 
+use Saloon\RateLimiter\Limit;
 use Saloon\Contracts\Response;
 use Saloon\Contracts\PendingRequest;
 use Saloon\RateLimiter\Helpers\LimitHelper;
@@ -24,56 +25,43 @@ trait HasRateLimiting
         // exceeded any limits already. If we have, then this middleware will stop
         // the request from being processed.
 
-        $pendingRequest->middleware()->onRequest(function () {
+        $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest) {
             if ($limit = $this->getExceededLimit()) {
-                $this->throwLimitException($limit);
+                $this->handleExceededLimit($limit, $pendingRequest);
             }
         });
 
         $pendingRequest->middleware()->onResponse(function (Response $response) {
-            // First, we'll use our LimitHelper to configure the limits on the request/connector
-            // this will populate the ID properly as well as setting the names if it needs to.
-
             $limits = LimitHelper::configureLimits($this->resolveLimits(), $this);
             $store = $this->resolveRateLimiterStore();
 
             $limitThatWasExceeded = null;
 
-            // Now we'll iterate over every limit class, and we'll check if the limit has
+            // First we'll iterate over every limit class, and we'll check if the limit has
             // been reached. We'll increment each of the limits and continue with the
             // response.
 
             foreach ($limits as $limit) {
-                // Let's first update the limit from the store, this will set the timestamp
-                // and the number of hits that has already happened.
-
-                $usesResponse = $limit->usesResponse();
+                // We'll update our limit from the store which should populate it with the
+                // latest timestamp and hits.
 
                 $limit->update($store);
 
-                if ($usesResponse === true) {
-                    $limit->handleResponse($response);
-                }
+                // Now we'll "hit" the limit which will increase the count
+                // We won't hit if it's a from response limiter.
 
-                // We'll make sure our limits haven't been exceeded yet - if they haven't then
-                // we will run the `checkForTooManyAttempts` method.
+                $limit->usesResponse()
+                    ? $limit->handleResponse($response)
+                    : $limit->hit();
 
-                if (is_null($limitThatWasExceeded) && $usesResponse === false) {
-                    $this->checkResponseForLimit($response, $limit);
-                }
+                // If our limit has been exceeded, we will assign the limit
+                // that was exceeded. This will throw an exception.
 
-                if ($limit->hasExceeded()) {
+                if ($limit->wasManuallyExceeded()) {
                     $limitThatWasExceeded = $limit;
                 }
 
-                // Now we'll "hit" the limit which will increase the count
-                // We won't hit if it's a from response limiter
-
-                if ($usesResponse === false) {
-                    $limit->hit();
-                }
-
-                // Next, we'll commit the limit onto the store
+                // Finally, we'll commit the limit onto the store
 
                 $limit->save($store);
             }
@@ -101,20 +89,6 @@ trait HasRateLimiting
      * @return RateLimiterStore
      */
     abstract protected function resolveRateLimiterStore(): RateLimiterStore;
-
-    /**
-     * Process the limit, can be extended
-     *
-     * @param \Saloon\Contracts\Response $response
-     * @param \Saloon\RateLimiter\Limit $limit
-     * @return void
-     */
-    protected function checkResponseForLimit(Response $response, Limit $limit): void
-    {
-        if ($response->status() === 429) {
-            $limit->exceeded();
-        }
-    }
 
     /**
      * Throw the limit exception
@@ -170,5 +144,24 @@ trait HasRateLimiting
     public function hasReachedRateLimit(?float $threshold = null): bool
     {
         return $this->getExceededLimit($threshold) instanceof Limit;
+    }
+
+    /**
+     * Handle the exceeded limit
+     *
+     * If the limit should wait, we will increment a delay - otherwise we will continue
+     *
+     * @throws \Saloon\RateLimiter\Exceptions\RateLimitReachedException
+     */
+    protected function handleExceededLimit(Limit $limit, PendingRequest $pendingRequest): void
+    {
+        if (! $limit->shouldWait()) {
+            $this->throwLimitException($limit);
+        }
+
+        $existingDelay = $pendingRequest->delay()->get() ?? 0;
+        $remainingMilliseconds = $limit->getRemainingSeconds() * 1000;
+
+        $pendingRequest->delay()->set($existingDelay + $remainingMilliseconds);
     }
 }

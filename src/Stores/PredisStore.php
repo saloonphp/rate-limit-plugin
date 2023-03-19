@@ -20,7 +20,7 @@ class PredisStore implements RateLimiterStore
     }
 
     /**
-     * Get the limit data for a given key
+     * Get a rate limit from the store
      *
      * @param string $key
      * @return string|null
@@ -31,7 +31,7 @@ class PredisStore implements RateLimiterStore
     }
 
     /**
-     * Commit the properties on the limit (hits, timestamp)
+     * Set the rate limit into the store
      *
      * @param string $key
      * @param string $value

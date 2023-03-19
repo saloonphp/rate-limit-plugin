@@ -30,7 +30,7 @@ class FileStore implements RateLimiterStore
     }
 
     /**
-     * Get an item from storage
+     * Get a rate limit from the store
      *
      * @param string $key
      * @return string|null
@@ -47,7 +47,7 @@ class FileStore implements RateLimiterStore
     }
 
     /**
-     * Store a file
+     * Set the rate limit into the store
      *
      * @param string $key
      * @param string $value

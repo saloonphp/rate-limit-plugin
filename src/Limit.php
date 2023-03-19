@@ -6,17 +6,19 @@ namespace Saloon\RateLimiter;
 
 use Closure;
 use ReflectionClass;
-use DateTimeImmutable;
 use Saloon\Helpers\Date;
 use InvalidArgumentException;
 use Saloon\Contracts\Request;
 use Saloon\Contracts\Response;
 use Saloon\Contracts\Connector;
+use Saloon\RateLimiter\Traits\HasIntervals;
 use Saloon\RateLimiter\Exceptions\LimitException;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
 class Limit
 {
+    use HasIntervals;
+
     /**
      * Connector string
      *
@@ -64,21 +66,6 @@ class Limit
     protected ?int $expiryTimestamp = null;
 
     /**
-     * The number of seconds it will take to release the rate limit after it has
-     * been reached.
-     *
-     * @var int
-     */
-    protected int $releaseInSeconds;
-
-    /**
-     * Optional time to live key to specify the time in the default key.
-     *
-     * @var string|null
-     */
-    protected ?string $timeToLiveKey = null;
-
-    /**
      * Determines if a limit has been manually exceeded.
      *
      * @var bool
@@ -93,13 +80,20 @@ class Limit
     protected ?Closure $responseHandler = null;
 
     /**
+     * Determines if we should wait or not
+     *
+     * @var bool
+     */
+    protected bool $shouldWait = false;
+
+    /**
      * Constructor
      *
      * @param int $allow
      * @param float $threshold
      * @param callable|null $responseHandler
      */
-    public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
+    final public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
     {
         $this->allow = $allow;
         $this->threshold = $threshold;
@@ -115,7 +109,7 @@ class Limit
      */
     public static function allow(int $requests, float $threshold = 1): static
     {
-        return new self($requests, $threshold);
+        return new static($requests, $threshold);
     }
 
     /**
@@ -126,7 +120,22 @@ class Limit
      */
     public static function fromResponse(callable $onResponse): static
     {
-        return (new self(1, 1, $onResponse(...)))->everySeconds(120, 'response');
+        return (new static(1, 1, $onResponse(...)))->everySeconds(120, 'response');
+    }
+
+    /**
+     * Detect when the response has a status of 429 and release by the number of seconds
+     *
+     * @param int $releaseInSeconds
+     * @return static
+     */
+    public static function fromTooManyRequests(int $releaseInSeconds): static
+    {
+        return static::fromResponse(static function (Response $response, Limit $limit) use ($releaseInSeconds) {
+            if ($response->status() === 429) {
+                $limit->exceeded($releaseInSeconds);
+            }
+        });
     }
 
     /**
@@ -146,16 +155,28 @@ class Limit
         return $this->hits >= ($threshold * $this->allow);
     }
 
+    /**
+     * Hit the limit
+     *
+     * @param int $amount
+     * @return $this
+     */
     public function hit(int $amount = 1): static
     {
-        if (! $this->hasExceeded()) {
+        if (! $this->wasManuallyExceeded()) {
             $this->hits += $amount;
         }
 
         return $this;
     }
 
-    public function exceeded($releaseInSeconds = null): void
+    /**
+     * Set the limit as exceeded
+     *
+     * @param int|null $releaseInSeconds
+     * @return void
+     */
+    public function exceeded(int $releaseInSeconds = null): void
     {
         $this->exceeded = true;
 
@@ -166,6 +187,11 @@ class Limit
         }
     }
 
+    /**
+     * Get the hits
+     *
+     * @return int
+     */
     public function getHits(): int
     {
         return $this->hits;
@@ -187,7 +213,7 @@ class Limit
      * @param string|null $name
      * @return $this
      */
-    public function name(?string $name): Limit
+    public function name(?string $name): static
     {
         $this->name = $name;
 
@@ -201,7 +227,7 @@ class Limit
      * @return $this
      * @throws \ReflectionException
      */
-    public function setObjectName(Connector|Request $object): Limit
+    public function setObjectName(Connector|Request $object): static
     {
         $this->objectName = (new ReflectionClass($object::class))->getShortName();
 
@@ -209,6 +235,8 @@ class Limit
     }
 
     /**
+     * Get the expiry timestamp
+     *
      * @return int|null
      */
     public function getExpiryTimestamp(): ?int
@@ -217,8 +245,10 @@ class Limit
     }
 
     /**
+     * Set the expiry timestamp
+     *
      * @param int|null $expiryTimestamp
-     * @return Limit
+     * @return $this
      */
     public function setExpiryTimestamp(?int $expiryTimestamp): static
     {
@@ -238,59 +268,6 @@ class Limit
         return $this->setExpiryTimestamp($this->getCurrentTimestamp() + $seconds);
     }
 
-    public function everySeconds(int $seconds, ?string $timeToLiveKey = null): static
-    {
-        $this->releaseInSeconds = $seconds;
-        $this->timeToLiveKey = $timeToLiveKey;
-
-        return $this;
-    }
-
-    public function everyMinute(): static
-    {
-        return $this->everySeconds(60);
-    }
-
-    public function everyFiveMinutes(): static
-    {
-        return $this->everySeconds(60 * 5);
-    }
-
-    public function everyThirtyMinutes(): static
-    {
-        return $this->everySeconds(60 * 30);
-    }
-
-    public function everyHour(): static
-    {
-        return $this->everySeconds(60 * 60);
-    }
-
-    public function everySixHours(): static
-    {
-        return $this->everySeconds(60 * 60 * 6);
-    }
-
-    public function everyTwelveHours(): static
-    {
-        return $this->everySeconds(60 * 60 * 12);
-    }
-
-    public function everyDay(): static
-    {
-        return $this->everySeconds(60 * 60 * 24);
-    }
-
-    public function untilMidnightTonight(): static
-    {
-        $tomorrowTimestamp = (new DateTimeImmutable('tomorrow'))->getTimestamp();
-
-        return $this->everySeconds(
-            seconds: $tomorrowTimestamp - $this->getCurrentTimestamp(),
-            timeToLiveKey: 'midnight'
-        );
-    }
-
     /**
      * Get the remaining time in seconds
      *
@@ -301,26 +278,74 @@ class Limit
         return (int)round($this->getExpiryTimestamp() - $this->getCurrentTimestamp());
     }
 
+    /**
+     * Get the release time in seconds
+     *
+     * @return int
+     */
     public function getReleaseInSeconds(): int
     {
         return $this->releaseInSeconds;
     }
 
-    public function hasExceeded(): bool
+    /**
+     * Check if the limit has been exceeded
+     *
+     * @return bool
+     */
+    public function wasManuallyExceeded(): bool
     {
         return $this->exceeded;
     }
 
-    public function validate()
+    /**
+     * Validate the limit
+     *
+     * @return void
+     */
+    public function validate(): void
     {
         // Todo: Validate we have allow and releaseInSeconds
     }
 
+    /**
+     * Wait until the release time instead of throwing an exception
+     *
+     * @return $this
+     */
+    public function waitUntilRelease(): static
+    {
+        $this->shouldWait = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks if the limit should wait
+     *
+     * @return bool
+     */
+    public function shouldWait(): bool
+    {
+        return $this->shouldWait;
+    }
+
+    /**
+     * Check if the limit uses a response
+     *
+     * @return bool
+     */
     public function usesResponse(): bool
     {
         return isset($this->responseHandler);
     }
 
+    /**
+     * Handle a response on the limit
+     *
+     * @param \Saloon\Contracts\Response $response
+     * @return void
+     */
     public function handleResponse(Response $response): void
     {
         if (! $this->usesResponse()) {
@@ -418,15 +443,5 @@ class Limit
         }
 
         return $this;
-    }
-
-    /**
-     * Get the current timestamp
-     *
-     * @return int
-     */
-    protected function getCurrentTimestamp(): int
-    {
-        return Date::now()->toDateTime()->getTimestamp();
     }
 }
