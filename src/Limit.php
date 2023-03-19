@@ -80,6 +80,13 @@ class Limit
     protected ?Closure $responseHandler = null;
 
     /**
+     * Determines if we should wait or not
+     *
+     * @var bool
+     */
+    protected bool $shouldWait = false;
+
+    /**
      * Constructor
      *
      * @param int $allow
@@ -299,6 +306,28 @@ class Limit
     public function validate(): void
     {
         // Todo: Validate we have allow and releaseInSeconds
+    }
+
+    /**
+     * Wait until the release time instead of throwing an exception
+     *
+     * @return $this
+     */
+    public function waitUntilRelease(): static
+    {
+        $this->shouldWait = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks if the limit should wait
+     *
+     * @return bool
+     */
+    public function shouldWait(): bool
+    {
+        return $this->shouldWait;
     }
 
     /**

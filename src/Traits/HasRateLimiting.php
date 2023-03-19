@@ -25,9 +25,9 @@ trait HasRateLimiting
         // exceeded any limits already. If we have, then this middleware will stop
         // the request from being processed.
 
-        $pendingRequest->middleware()->onRequest(function () {
+        $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest) {
             if ($limit = $this->getExceededLimit()) {
-                $this->throwLimitException($limit);
+                $this->handleExceededLimit($limit, $pendingRequest);
             }
         });
 
@@ -144,5 +144,24 @@ trait HasRateLimiting
     public function hasReachedRateLimit(?float $threshold = null): bool
     {
         return $this->getExceededLimit($threshold) instanceof Limit;
+    }
+
+    /**
+     * Handle the exceeded limit
+     *
+     * If the limit should wait, we will increment a delay - otherwise we will continue
+     *
+     * @throws \Saloon\RateLimiter\Exceptions\RateLimitReachedException
+     */
+    protected function handleExceededLimit(Limit $limit, PendingRequest $pendingRequest): void
+    {
+        if (! $limit->shouldWait()) {
+            $this->throwLimitException($limit);
+        }
+
+        $existingDelay = $pendingRequest->delay()->get() ?? 0;
+        $remainingMilliseconds = $limit->getRemainingSeconds() * 1000;
+
+        $pendingRequest->delay()->set($existingDelay + $remainingMilliseconds);
     }
 }
