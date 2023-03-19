@@ -110,7 +110,7 @@ trait HasIntervals
     }
 
     /**
-     * Set the limit to be released every week
+     * Set the limit to be released at the end of the month
      *
      * @return $this
      */
