@@ -29,7 +29,7 @@ trait HasRateLimiting
             if ($limit = $this->getExceededLimit()) {
                 $this->handleExceededLimit($limit, $pendingRequest);
             }
-        });
+        }, prepend: true);
 
         $pendingRequest->middleware()->onResponse(function (Response $response) {
             $limits = LimitHelper::configureLimits($this->resolveLimits(), $this);
@@ -73,7 +73,7 @@ trait HasRateLimiting
             if (isset($limitThatWasExceeded)) {
                 $this->throwLimitException($limitThatWasExceeded);
             }
-        });
+        }, prepend: true);
     }
 
     /**

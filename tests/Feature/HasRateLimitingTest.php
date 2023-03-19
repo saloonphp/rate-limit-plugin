@@ -67,3 +67,7 @@ test('you can create a limit that waits instead of throwing an error', function 
 
     expect(round(microtime(true) - $start))->toBeGreaterThanOrEqual(5);
 });
+
+test('if a connector has the AlwaysThrowOnError trait then the limiter will take priority', function () {
+    // Todo: This tests the "prepend" on the HasRateLimiting middleware
+});
