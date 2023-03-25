@@ -14,6 +14,13 @@ use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
 trait HasRateLimiting
 {
     /**
+     * Is Rate limiting is enabled?
+     *
+     * @var bool
+     */
+    protected bool $rateLimitingEnabled = true;
+
+    /**
      * Boot the has rate limiting trait
      *
      * @param \Saloon\Contracts\PendingRequest $pendingRequest
@@ -21,6 +28,10 @@ trait HasRateLimiting
      */
     public function bootHasRateLimiting(PendingRequest $pendingRequest): void
     {
+        if (! $this->rateLimitingEnabled) {
+            return;
+        }
+
         // Firstly, we'll register a request middleware that will check if we have
         // exceeded any limits already. If we have, then this middleware will stop
         // the request from being processed.
@@ -163,5 +174,18 @@ trait HasRateLimiting
         $remainingMilliseconds = $limit->getRemainingSeconds() * 1000;
 
         $pendingRequest->delay()->set($existingDelay + $remainingMilliseconds);
+    }
+
+    /**
+     * Enable or disable the rate limiting functionality
+     *
+     * @param bool $enabled
+     * @return $this
+     */
+    public function useRateLimiting(bool $enabled = true): static
+    {
+        $this->rateLimitingEnabled = $enabled;
+
+        return $this;
     }
 }

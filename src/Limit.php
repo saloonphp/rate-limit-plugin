@@ -163,7 +163,7 @@ class Limit
      */
     public function hit(int $amount = 1): static
     {
-        if (! $this->wasManuallyExceeded()) {
+        if (! $this->wasManuallyExceeded() && ! $this->usesResponse()) {
             $this->hits += $amount;
         }
 
@@ -258,14 +258,17 @@ class Limit
     }
 
     /**
-     * Set the expiry timestamp from seconds
+     * Reset the limit
      *
-     * @param int $seconds
      * @return $this
      */
-    public function setExpiryTimestampFromSeconds(int $seconds): static
+    public function resetLimit(): static
     {
-        return $this->setExpiryTimestamp($this->getCurrentTimestamp() + $seconds);
+        $this->expiryTimestamp = null;
+        $this->hits = 0;
+        $this->exceeded = false;
+
+        return $this;
     }
 
     /**
@@ -417,12 +420,22 @@ class Limit
      * Save the limit into the store
      *
      * @param \Saloon\RateLimiter\Contracts\RateLimiterStore $store
+     * @param int $resetHits
      * @return $this
      * @throws \JsonException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
      */
-    public function save(RateLimiterStore $store): static
+    public function save(RateLimiterStore $store, int $resetHits = 1): static
     {
+        // We may attempt to save the limit just as the expiry timestamp
+        // passes, so we need to check that the remaining seconds isn't
+        // less than zero. If it is zero or if it's negative, we will
+        // reset the limit completely and hit once.
+
+        if ($this->getRemainingSeconds() < 1) {
+            $this->resetLimit()->hit($resetHits);
+        }
+
         $data = [
             'timestamp' => $this->getExpiryTimestamp(),
             'hits' => $this->getHits(),
