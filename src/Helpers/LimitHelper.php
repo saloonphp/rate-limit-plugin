@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter\Helpers;
 
 use Closure;
-use Saloon\Contracts\Response;
-use Saloon\Helpers\Arr;
-use Saloon\Contracts\Request;
 use Saloon\RateLimiter\Limit;
-use Saloon\Contracts\Connector;
+use Saloon\Contracts\Response;
 use Saloon\RateLimiter\Exceptions\LimitException;
 
 class LimitHelper
@@ -28,7 +25,7 @@ class LimitHelper
         // Firstly, we will clean up the limits array to only ensure the `Limit` classes
         // are being processed.
 
-        $limits = array_filter($limits, static fn(mixed $value) => $value instanceof Limit);
+        $limits = array_filter($limits, static fn (mixed $value) => $value instanceof Limit);
 
         // Next we will append our "too many attempts" limit which will be used when
         // the response actually hits a 429 status.
@@ -41,7 +38,7 @@ class LimitHelper
 
         // Next we will set the prefix on each of the limits.
 
-        $limits = array_map(static fn(Limit $limit) => $limit->setPrefix($prefix), $limits);
+        $limits = array_map(static fn (Limit $limit) => $limit->setPrefix($prefix), $limits);
 
         // Finally, we will check if there are any duplicate limits. If there are, then we will
         // throw an exception instead of continuing.
@@ -61,7 +58,7 @@ class LimitHelper
      */
     private static function getDuplicate(array $limits): ?string
     {
-        $limitNames = array_map(static fn(Limit $limit) => $limit->getName(), $limits);
+        $limitNames = array_map(static fn (Limit $limit) => $limit->getName(), $limits);
 
         foreach (array_count_values($limitNames) as $name => $count) {
             if ($count > 1) {

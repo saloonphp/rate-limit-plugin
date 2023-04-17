@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter;
 
 use Closure;
-use ReflectionClass;
 use Saloon\Helpers\Date;
 use InvalidArgumentException;
-use Saloon\Contracts\Request;
 use Saloon\Contracts\Response;
-use Saloon\Contracts\Connector;
 use Saloon\RateLimiter\Traits\HasIntervals;
 use Saloon\RateLimiter\Exceptions\LimitException;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
