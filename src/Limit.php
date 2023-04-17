@@ -20,11 +20,11 @@ class Limit
     use HasIntervals;
 
     /**
-     * Connector string
+     * Name prefix
      *
      * @var string
      */
-    protected string $objectName;
+    protected string $prefix = 'rate_limiter';
 
     /**
      * Name of the limit
@@ -120,7 +120,7 @@ class Limit
      */
     public static function fromResponse(callable $onResponse): static
     {
-        return (new static(1, 1, $onResponse(...)))->everySeconds(120, 'response');
+        return (new static(1, 1, $onResponse(...)))->everySeconds(60, 'response');
     }
 
     /**
@@ -204,7 +204,11 @@ class Limit
      */
     public function getName(): string
     {
-        return $this->name ?? sprintf('%s_allow_%s_every_%s', $this->objectName, $this->allow, $this->timeToLiveKey ?? (string)$this->releaseInSeconds);
+        if (isset($this->name)) {
+            return $this->prefix . ':' . $this->name;
+        }
+
+        return $this->prefix . ':' . sprintf('%s_every_%s', $this->allow, $this->timeToLiveKey ?? (string)$this->releaseInSeconds);
     }
 
     /**
@@ -216,20 +220,6 @@ class Limit
     public function name(?string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Set the object name for the default name
-     *
-     * @param \Saloon\Contracts\Connector|\Saloon\Contracts\Request $object
-     * @return $this
-     * @throws \ReflectionException
-     */
-    public function setObjectName(Connector|Request $object): static
-    {
-        $this->objectName = (new ReflectionClass($object::class))->getShortName();
 
         return $this;
     }
@@ -476,5 +466,18 @@ class Limit
     public function getThreshold(): float
     {
         return $this->threshold;
+    }
+
+    /**
+     * Set the prefix
+     *
+     * @param string $prefix
+     * @return Limit
+     */
+    public function setPrefix(string $prefix): Limit
+    {
+        $this->prefix = $prefix;
+
+        return $this;
     }
 }

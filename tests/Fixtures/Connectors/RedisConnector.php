@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
 use Redis;
+use Saloon\Contracts\Response;
 use Saloon\Http\Connector;
 use Saloon\RateLimiter\Limit;
 use Saloon\RateLimiter\Stores\RedisStore;
@@ -18,6 +19,11 @@ final class RedisConnector extends Connector
     public function resolveBaseUrl(): string
     {
         return 'https://tests.saloon.dev/api';
+    }
+
+    protected function getLimiterPrefix(): string
+    {
+        return 'spotify';
     }
 
     /**

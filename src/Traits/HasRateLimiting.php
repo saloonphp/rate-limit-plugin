@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Traits;
 
+use ReflectionClass;
 use Saloon\RateLimiter\Limit;
 use Saloon\Contracts\Response;
 use Saloon\Contracts\PendingRequest;
@@ -50,7 +51,7 @@ trait HasRateLimiting
         }, prepend: true);
 
         $pendingRequest->middleware()->onResponse(function (Response $response) {
-            $limits = LimitHelper::configureLimits($this->resolveLimits(), $this);
+            $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $this->handleTooManyAttempts(...));
             $store = $this->getRateLimiterStore();
 
             $limitThatWasExceeded = null;
@@ -109,6 +110,29 @@ trait HasRateLimiting
     abstract protected function resolveRateLimiterStore(): RateLimiterStore;
 
     /**
+     * Get the prefix added to every limit
+     *
+     * @return string
+     */
+    protected function getLimiterPrefix(): string
+    {
+        return (new ReflectionClass($this))->getShortName();
+    }
+
+    /**
+     * Handle too many attempts (429) statuses
+     *
+     * @param \Saloon\Contracts\Response $response
+     * @param \Saloon\RateLimiter\Limit $limit
+     * @return void
+     */
+    protected function handleTooManyAttempts(Response $response, Limit $limit): void
+    {
+        // Todo: Use a common header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) and default to 60
+        $limit->exceeded(60);
+    }
+
+    /**
      * Throw the limit exception
      *
      * @param \Saloon\RateLimiter\Limit $limit
@@ -126,12 +150,12 @@ trait HasRateLimiting
      * @param float|null $threshold
      * @return \Saloon\RateLimiter\Limit|null
      * @throws \JsonException
-     * @throws \ReflectionException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
+     * @throws \Exception
      */
     public function getExceededLimit(?float $threshold = null): ?Limit
     {
-        $limits = LimitHelper::configureLimits($this->resolveLimits(), $this);
+        $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $this->handleTooManyAttempts(...));
 
         if (empty($limits)) {
             return null;
@@ -203,6 +227,6 @@ trait HasRateLimiting
      */
     public function getRateLimiterStore(): RateLimiterStore
     {
-        return $this->rateLimiterStore ?? $this->resolveRateLimiterStore();
+        return $this->rateLimiterStore ??= $this->resolveRateLimiterStore();
     }
 }
