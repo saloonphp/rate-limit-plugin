@@ -113,9 +113,9 @@ trait HasRateLimiting
     /**
      * Get the prefix added to every limit
      *
-     * @return string
+     * @return string|null
      */
-    protected function getLimiterPrefix(): string
+    protected function getLimiterPrefix(): ?string
     {
         return (new ReflectionClass($this))->getShortName();
     }

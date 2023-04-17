@@ -21,7 +21,7 @@ class Limit
      *
      * @var string
      */
-    protected string $prefix = 'rate_limiter';
+    protected string $prefix = 'saloon_rate_limiter';
 
     /**
      * Name of the limit
@@ -205,7 +205,7 @@ class Limit
             return $this->prefix . ':' . $this->name;
         }
 
-        return $this->prefix . ':' . sprintf('%s_every_%s', $this->allow, $this->timeToLiveKey ?? (string)$this->releaseInSeconds);
+        return sprintf('%s:%s_every_%s', $this->prefix, $this->allow, $this->timeToLiveKey ?? (string)$this->releaseInSeconds);
     }
 
     /**
