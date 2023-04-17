@@ -80,11 +80,11 @@ class Limit
     protected ?Closure $responseHandler = null;
 
     /**
-     * Determines if we should wait or not
+     * Determines if we should sleep or not
      *
      * @var bool
      */
-    protected bool $shouldWait = false;
+    protected bool $shouldSleep = false;
 
     /**
      * Constructor
@@ -316,9 +316,9 @@ class Limit
      *
      * @return $this
      */
-    public function waitUntilRelease(): static
+    public function sleep(): static
     {
-        $this->shouldWait = true;
+        $this->shouldSleep = true;
 
         return $this;
     }
@@ -328,9 +328,9 @@ class Limit
      *
      * @return bool
      */
-    public function shouldWait(): bool
+    public function shouldSleep(): bool
     {
-        return $this->shouldWait;
+        return $this->shouldSleep;
     }
 
     /**
@@ -456,5 +456,25 @@ class Limit
         }
 
         return $this;
+    }
+
+    /**
+     * Get the number of requests allowed in the interval
+     *
+     * @return int
+     */
+    public function getAllow(): int
+    {
+        return $this->allow;
+    }
+
+    /**
+     * Get the threshold allowed in the interval
+     *
+     * @return float
+     */
+    public function getThreshold(): float
+    {
+        return $this->threshold;
     }
 }

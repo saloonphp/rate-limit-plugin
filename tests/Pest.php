@@ -43,9 +43,5 @@ expect()->extend('toBeOne', function () {
 
 function decodeStoreData(?string $data): ?array
 {
-    if (empty($data)) {
-        return null;
-    }
-
-    return json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+    return ! empty($data) ? json_decode($data, true, 512, JSON_THROW_ON_ERROR) : null;
 }

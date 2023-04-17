@@ -30,7 +30,7 @@ final class WaitConnector extends Connector
     protected function resolveLimits(): array
     {
         return [
-            Limit::allow(1)->everySeconds(5)->waitUntilRelease(),
+            Limit::allow(1)->everySeconds(5)->sleep(),
         ];
     }
 

@@ -29,6 +29,8 @@ class LimitHelper
             return [];
         }
 
+        // Todo: Remove setObjectName in favor of setting the name here if it has not already been set
+
         $limits = Arr::mapWithKeys($limits, static function (Limit $limit, int|string $key) use ($connectorOrRequest) {
             return [$key => is_string($key) ? $limit->name($key) : $limit->setObjectName($connectorOrRequest)];
         });

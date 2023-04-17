@@ -21,6 +21,13 @@ trait HasRateLimiting
     protected bool $rateLimitingEnabled = true;
 
     /**
+     * The rate limiter store
+     *
+     * @var \Saloon\RateLimiter\Contracts\RateLimiterStore|null
+     */
+    protected ?RateLimiterStore $rateLimiterStore = null;
+
+    /**
      * Boot the has rate limiting trait
      *
      * @param \Saloon\Contracts\PendingRequest $pendingRequest
@@ -44,7 +51,7 @@ trait HasRateLimiting
 
         $pendingRequest->middleware()->onResponse(function (Response $response) {
             $limits = LimitHelper::configureLimits($this->resolveLimits(), $this);
-            $store = $this->resolveRateLimiterStore();
+            $store = $this->getRateLimiterStore();
 
             $limitThatWasExceeded = null;
 
@@ -130,7 +137,7 @@ trait HasRateLimiting
             return null;
         }
 
-        $store = $this->resolveRateLimiterStore();
+        $store = $this->getRateLimiterStore();
 
         foreach ($limits as $limit) {
             $limit->update($store);
@@ -166,7 +173,7 @@ trait HasRateLimiting
      */
     protected function handleExceededLimit(Limit $limit, PendingRequest $pendingRequest): void
     {
-        if (! $limit->shouldWait()) {
+        if (! $limit->shouldSleep()) {
             $this->throwLimitException($limit);
         }
 
@@ -187,5 +194,15 @@ trait HasRateLimiting
         $this->rateLimitingEnabled = $enabled;
 
         return $this;
+    }
+
+    /**
+     * Get the rate limiter store
+     *
+     * @return \Saloon\RateLimiter\Contracts\RateLimiterStore
+     */
+    public function getRateLimiterStore(): RateLimiterStore
+    {
+        return $this->rateLimiterStore ?? $this->resolveRateLimiterStore();
     }
 }

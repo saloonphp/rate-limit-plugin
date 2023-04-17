@@ -52,12 +52,13 @@ test('you can specify a custom closure to determine the limiter based on respons
     // Todo: Make a mock client where the third request has a body status of "429" but the HTTP status is 200
 });
 
-test('you can create a limit that waits instead of throwing an error', function () {
+test('you can create a limit that sleeps instead of throwing an error', function () {
     $connector = new WaitConnector;
     $request = new UserRequest;
 
-    // The first request should send like normal, but the second request should wait
-    // 5 seconds before continuing.
+    // The first request should send like normal, but
+    // the second request should wait 5 seconds before
+    // continuing.
 
     $connector->send($request);
 
