@@ -130,7 +130,7 @@ trait HasRateLimiting
     protected function handleTooManyAttempts(Response $response, Limit $limit): void
     {
         $limit->exceeded(
-            RetryAfterHelper::parse($response->header('Retry-After')) ?? 60,
+            releaseInSeconds: RetryAfterHelper::parse($response->header('Retry-After')),
         );
     }
 
