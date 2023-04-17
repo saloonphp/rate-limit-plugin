@@ -6,6 +6,7 @@ namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
 use Redis;
 use Saloon\Http\Connector;
+use Saloon\RateLimiter\Helpers\RetryAfterHelper;
 use Saloon\RateLimiter\Limit;
 use Saloon\RateLimiter\Stores\RedisStore;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
@@ -18,11 +19,6 @@ final class RedisConnector extends Connector
     public function resolveBaseUrl(): string
     {
         return 'https://tests.saloon.dev/api';
-    }
-
-    protected function getLimiterPrefix(): string
-    {
-        return 'spotify';
     }
 
     /**

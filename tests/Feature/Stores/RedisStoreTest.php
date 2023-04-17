@@ -16,7 +16,7 @@ test('it works with redis connector', function () {
     $request = new UserRequest;
 
     $connector->withMockClient(new MockClient([
-        new MockResponse(['name' => 'Sam'], 429),
+        new MockResponse(['name' => 'Sam']),
     ]));
 
     $response = $connector->send($request);

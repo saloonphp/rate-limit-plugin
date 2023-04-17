@@ -160,7 +160,7 @@ class Limit
      */
     public function hit(int $amount = 1): static
     {
-        if (! $this->wasManuallyExceeded() && ! $this->usesResponse()) {
+        if (! $this->wasManuallyExceeded()) {
             $this->hits += $amount;
         }
 

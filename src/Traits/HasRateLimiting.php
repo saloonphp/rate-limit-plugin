@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter\Traits;
 
 use ReflectionClass;
+use Saloon\RateLimiter\Helpers\RetryAfterHelper;
 use Saloon\RateLimiter\Limit;
 use Saloon\Contracts\Response;
 use Saloon\Contracts\PendingRequest;
@@ -128,8 +129,9 @@ trait HasRateLimiting
      */
     protected function handleTooManyAttempts(Response $response, Limit $limit): void
     {
-        // Todo: Use a common header (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) and default to 60
-        $limit->exceeded(60);
+        $limit->exceeded(
+            RetryAfterHelper::parse($response->header('Retry-After')) ?? 60,
+        );
     }
 
     /**
