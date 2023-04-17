@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Saloon\RateLimiter;
 
 use Closure;
-use ReflectionClass;
 use Saloon\Helpers\Date;
 use InvalidArgumentException;
-use Saloon\Contracts\Request;
 use Saloon\Contracts\Response;
-use Saloon\Contracts\Connector;
 use Saloon\RateLimiter\Traits\HasIntervals;
 use Saloon\RateLimiter\Exceptions\LimitException;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
@@ -20,11 +17,11 @@ class Limit
     use HasIntervals;
 
     /**
-     * Connector string
+     * Name prefix
      *
      * @var string
      */
-    protected string $objectName;
+    protected string $prefix = 'saloon_rate_limiter';
 
     /**
      * Name of the limit
@@ -80,11 +77,11 @@ class Limit
     protected ?Closure $responseHandler = null;
 
     /**
-     * Determines if we should wait or not
+     * Determines if we should sleep or not
      *
      * @var bool
      */
-    protected bool $shouldWait = false;
+    protected bool $shouldSleep = false;
 
     /**
      * Constructor
@@ -120,7 +117,7 @@ class Limit
      */
     public static function fromResponse(callable $onResponse): static
     {
-        return (new static(1, 1, $onResponse(...)))->everySeconds(120, 'response');
+        return (new static(1, 1, $onResponse(...)))->everySeconds(60, 'response');
     }
 
     /**
@@ -204,7 +201,11 @@ class Limit
      */
     public function getName(): string
     {
-        return $this->name ?? sprintf('%s_allow_%s_every_%s', $this->objectName, $this->allow, $this->timeToLiveKey ?? (string)$this->releaseInSeconds);
+        if (isset($this->name)) {
+            return $this->prefix . ':' . $this->name;
+        }
+
+        return sprintf('%s:%s_every_%s', $this->prefix, $this->allow, $this->timeToLiveKey ?? (string)$this->releaseInSeconds);
     }
 
     /**
@@ -216,20 +217,6 @@ class Limit
     public function name(?string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Set the object name for the default name
-     *
-     * @param \Saloon\Contracts\Connector|\Saloon\Contracts\Request $object
-     * @return $this
-     * @throws \ReflectionException
-     */
-    public function setObjectName(Connector|Request $object): static
-    {
-        $this->objectName = (new ReflectionClass($object::class))->getShortName();
 
         return $this;
     }
@@ -258,14 +245,17 @@ class Limit
     }
 
     /**
-     * Set the expiry timestamp from seconds
+     * Reset the limit
      *
-     * @param int $seconds
      * @return $this
      */
-    public function setExpiryTimestampFromSeconds(int $seconds): static
+    public function resetLimit(): static
     {
-        return $this->setExpiryTimestamp($this->getCurrentTimestamp() + $seconds);
+        $this->expiryTimestamp = null;
+        $this->hits = 0;
+        $this->exceeded = false;
+
+        return $this;
     }
 
     /**
@@ -313,9 +303,9 @@ class Limit
      *
      * @return $this
      */
-    public function waitUntilRelease(): static
+    public function sleep(): static
     {
-        $this->shouldWait = true;
+        $this->shouldSleep = true;
 
         return $this;
     }
@@ -325,9 +315,9 @@ class Limit
      *
      * @return bool
      */
-    public function shouldWait(): bool
+    public function shouldSleep(): bool
     {
-        return $this->shouldWait;
+        return $this->shouldSleep;
     }
 
     /**
@@ -417,12 +407,22 @@ class Limit
      * Save the limit into the store
      *
      * @param \Saloon\RateLimiter\Contracts\RateLimiterStore $store
+     * @param int $resetHits
      * @return $this
      * @throws \JsonException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
      */
-    public function save(RateLimiterStore $store): static
+    public function save(RateLimiterStore $store, int $resetHits = 1): static
     {
+        // We may attempt to save the limit just as the expiry timestamp
+        // passes, so we need to check that the remaining seconds isn't
+        // less than zero. If it is zero or if it's negative, we will
+        // reset the limit completely and hit once.
+
+        if ($this->getRemainingSeconds() < 1) {
+            $this->resetLimit()->hit($resetHits);
+        }
+
         $data = [
             'timestamp' => $this->getExpiryTimestamp(),
             'hits' => $this->getHits(),
@@ -441,6 +441,39 @@ class Limit
         if ($successful === false) {
             throw new LimitException('The store was unable to update the limit.');
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the number of requests allowed in the interval
+     *
+     * @return int
+     */
+    public function getAllow(): int
+    {
+        return $this->allow;
+    }
+
+    /**
+     * Get the threshold allowed in the interval
+     *
+     * @return float
+     */
+    public function getThreshold(): float
+    {
+        return $this->threshold;
+    }
+
+    /**
+     * Set the prefix
+     *
+     * @param string $prefix
+     * @return Limit
+     */
+    public function setPrefix(string $prefix): Limit
+    {
+        $this->prefix = $prefix;
 
         return $this;
     }
