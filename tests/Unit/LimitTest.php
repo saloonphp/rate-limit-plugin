@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Saloon\RateLimiter\Limit;
 
 test('you can create a limiter and specify an allow and threshold', function () {
@@ -25,4 +27,3 @@ test('if the expiry timestamp is empty then the current timestamp will be used',
 test('you can get the remaining seconds left on the limiter', function () {
     //
 });
-

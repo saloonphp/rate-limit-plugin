@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 test('you can save and update a limiter from the store', function () {
     //
 });
