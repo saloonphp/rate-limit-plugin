@@ -315,7 +315,7 @@ class Limit
      *
      * @return bool
      */
-    public function shouldSleep(): bool
+    public function getShouldSleep(): bool
     {
         return $this->shouldSleep;
     }

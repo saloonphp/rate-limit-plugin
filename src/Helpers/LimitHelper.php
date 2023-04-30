@@ -22,6 +22,8 @@ class LimitHelper
      */
     public static function configureLimits(array $limits, ?string $prefix, Closure $tooManyAttemptsHandler): array
     {
+        // Todo: Refactor this - I'm not a fan of all this logic being separate
+
         // Firstly, we will clean up the limits array to only ensure the `Limit` classes
         // are being processed.
 

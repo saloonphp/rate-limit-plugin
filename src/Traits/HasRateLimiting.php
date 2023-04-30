@@ -199,7 +199,7 @@ trait HasRateLimiting
      */
     protected function handleExceededLimit(Limit $limit, PendingRequest $pendingRequest): void
     {
-        if (! $limit->shouldSleep()) {
+        if (! $limit->getShouldSleep()) {
             $this->throwLimitException($limit);
         }
 

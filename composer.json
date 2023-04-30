@@ -22,7 +22,8 @@
         "phpstan/phpstan": "^1.9",
         "predis/predis": "^2.1",
         "psr/simple-cache": "^3.0",
-        "spatie/ray": "^1.33"
+        "spatie/ray": "^1.33",
+        "mockery/mockery": "^1.5"
     },
     "minimum-stability": "stable",
     "autoload": {
