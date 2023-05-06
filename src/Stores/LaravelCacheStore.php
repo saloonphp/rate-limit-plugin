@@ -1,24 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Saloon\RateLimiter\Stores;
 
+use Illuminate\Contracts\Cache\Store;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
-class MemoryStore implements RateLimiterStore
+class LaravelCacheStore implements RateLimiterStore
 {
     /**
-     * Limiter Store
+     * Constructor
      */
-    protected array $store = [];
+    public function __construct(protected Store $store)
+    {
+        //
+    }
 
     /**
      * Get a rate limit from the store
      */
     public function get(string $key): ?string
     {
-        return $this->store[$key] ?? null;
+        $data = $this->store->get($key);
+
+        return is_string($data) ? $data : null;
     }
 
     /**
@@ -26,16 +30,6 @@ class MemoryStore implements RateLimiterStore
      */
     public function set(string $key, string $value, int $ttl): bool
     {
-        $this->store[$key] = $value;
-
-        return true;
-    }
-
-    /**
-     * Get the store
-     */
-    public function getStore(): array
-    {
-        return $this->store;
+        return $this->store->put($key, $value, $ttl);
     }
 }

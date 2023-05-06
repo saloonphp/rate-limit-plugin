@@ -15,12 +15,10 @@ class LimitHelper
      * Hydrate the limits
      *
      * @param array<Limit> $limits
-     * @param string|null $prefix
-     * @param \Closure $tooManyAttemptsHandler
      * @return array<Limit>
-     * @throws \Saloon\RateLimiter\Exceptions\LimitException
+     * @throws LimitException
      */
-    public static function configureLimits(array $limits, ?string $prefix, Closure $tooManyAttemptsHandler): array
+    public static function configureLimits(array $limits, ?string $prefix, ?Closure $tooManyAttemptsHandler = null): array
     {
         // Todo: Refactor this - I'm not a fan of all this logic being separate
 
@@ -32,11 +30,13 @@ class LimitHelper
         // Next we will append our "too many attempts" limit which will be used when
         // the response actually hits a 429 status.
 
-        $limits[] = Limit::fromResponse(static function (Response $response, Limit $limit) use ($tooManyAttemptsHandler) {
-            if ($response->status() === 429) {
-                $tooManyAttemptsHandler($response, $limit);
-            }
-        })->name('too_many_attempts_limit');
+        if (isset($tooManyAttemptsHandler)) {
+            $limits[] = Limit::fromResponse(static function (Response $response, Limit $limit) use ($tooManyAttemptsHandler) {
+                if ($response->status() === 429) {
+                    $tooManyAttemptsHandler($response, $limit);
+                }
+            })->name('too_many_attempts_limit');
+        }
 
         // Next we will set the prefix on each of the limits.
 
@@ -56,7 +56,6 @@ class LimitHelper
      * Get the first duplicate limit
      *
      * @param array<Limit> $limits
-     * @return string|null
      */
     private static function getDuplicate(array $limits): ?string
     {

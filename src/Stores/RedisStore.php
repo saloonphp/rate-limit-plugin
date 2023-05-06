@@ -11,8 +11,6 @@ class RedisStore implements RateLimiterStore
 {
     /**
      * Constructor
-     *
-     * @param \Redis $redis
      */
     public function __construct(readonly protected Redis $redis)
     {
@@ -22,8 +20,6 @@ class RedisStore implements RateLimiterStore
     /**
      * Get a rate limit from the store
      *
-     * @param string $key
-     * @return string|null
      * @throws \RedisException
      */
     public function get(string $key): ?string
@@ -36,10 +32,6 @@ class RedisStore implements RateLimiterStore
     /**
      * Set the rate limit into the store
      *
-     * @param string $key
-     * @param string $value
-     * @param int $ttl
-     * @return bool
      * @throws \RedisException
      */
     public function set(string $key, string $value, int $ttl): bool

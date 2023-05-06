@@ -18,29 +18,21 @@ class Limit
 
     /**
      * Name prefix
-     *
-     * @var string
      */
     protected string $prefix = 'saloon_rate_limiter';
 
     /**
      * Name of the limit
-     *
-     * @var string|null
      */
     protected ?string $name = null;
 
     /**
      * Number of hits the limit has had
-     *
-     * @var int
      */
     protected int $hits = 0;
 
     /**
      * Number of requests that are allowed in the time period
-     *
-     * @var int
      */
     protected int $allow;
 
@@ -49,46 +41,32 @@ class Limit
      *
      * Must be between 0 and 1. For example if you want the limiter to kick in at 85%
      * you must set the threshold to 0.85
-     *
-     * @var float
      */
     protected float $threshold = 1;
 
     /**
      * The expiry timestamp of the rate limiter. Used to determine how much longer
      * a limiter's hits should last.
-     *
-     * @var int|null
      */
     protected ?int $expiryTimestamp = null;
 
     /**
      * Determines if a limit has been manually exceeded.
-     *
-     * @var bool
      */
     protected bool $exceeded = false;
 
     /**
      * Custom response handler
-     *
-     * @var Closure|null
      */
     protected ?Closure $responseHandler = null;
 
     /**
      * Determines if we should sleep or not
-     *
-     * @var bool
      */
     protected bool $shouldSleep = false;
 
     /**
      * Constructor
-     *
-     * @param int $allow
-     * @param float $threshold
-     * @param callable|null $responseHandler
      */
     final public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
     {
@@ -99,10 +77,6 @@ class Limit
 
     /**
      * Construct a limiter's allow and threshold
-     *
-     * @param int $requests
-     * @param float $threshold
-     * @return static
      */
     public static function allow(int $requests, float $threshold = 1): static
     {
@@ -111,9 +85,6 @@ class Limit
 
     /**
      * Construct a custom "fromResponse" limier
-     *
-     * @param callable $onResponse
-     * @return static
      */
     public static function fromResponse(callable $onResponse): static
     {
@@ -122,9 +93,6 @@ class Limit
 
     /**
      * Detect when the response has a status of 429 and release by the number of seconds
-     *
-     * @param int $releaseInSeconds
-     * @return static
      */
     public static function fromTooManyRequests(int $releaseInSeconds): static
     {
@@ -137,9 +105,6 @@ class Limit
 
     /**
      * Check if the limit has been reached
-     *
-     * @param float|null $threshold
-     * @return bool
      */
     public function hasReachedLimit(?float $threshold = null): bool
     {
@@ -155,7 +120,6 @@ class Limit
     /**
      * Hit the limit
      *
-     * @param int $amount
      * @return $this
      */
     public function hit(int $amount = 1): static
@@ -169,9 +133,6 @@ class Limit
 
     /**
      * Set the limit as exceeded
-     *
-     * @param int|null $releaseInSeconds
-     * @return void
      */
     public function exceeded(int $releaseInSeconds = null): void
     {
@@ -186,8 +147,6 @@ class Limit
 
     /**
      * Get the hits
-     *
-     * @return int
      */
     public function getHits(): int
     {
@@ -196,8 +155,6 @@ class Limit
 
     /**
      * Get the name of the limit
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -211,7 +168,6 @@ class Limit
     /**
      * Specify a custom name
      *
-     * @param string|null $name
      * @return $this
      */
     public function name(?string $name): static
@@ -223,8 +179,6 @@ class Limit
 
     /**
      * Get the expiry timestamp
-     *
-     * @return int|null
      */
     public function getExpiryTimestamp(): ?int
     {
@@ -234,7 +188,6 @@ class Limit
     /**
      * Set the expiry timestamp
      *
-     * @param int|null $expiryTimestamp
      * @return $this
      */
     public function setExpiryTimestamp(?int $expiryTimestamp): static
@@ -260,8 +213,6 @@ class Limit
 
     /**
      * Get the remaining time in seconds
-     *
-     * @return int
      */
     public function getRemainingSeconds(): int
     {
@@ -270,8 +221,6 @@ class Limit
 
     /**
      * Get the release time in seconds
-     *
-     * @return int
      */
     public function getReleaseInSeconds(): int
     {
@@ -280,8 +229,6 @@ class Limit
 
     /**
      * Check if the limit has been exceeded
-     *
-     * @return bool
      */
     public function wasManuallyExceeded(): bool
     {
@@ -290,8 +237,6 @@ class Limit
 
     /**
      * Validate the limit
-     *
-     * @return void
      */
     public function validate(): void
     {
@@ -312,8 +257,6 @@ class Limit
 
     /**
      * Checks if the limit should wait
-     *
-     * @return bool
      */
     public function getShouldSleep(): bool
     {
@@ -322,8 +265,6 @@ class Limit
 
     /**
      * Check if the limit uses a response
-     *
-     * @return bool
      */
     public function usesResponse(): bool
     {
@@ -332,9 +273,6 @@ class Limit
 
     /**
      * Handle a response on the limit
-     *
-     * @param \Saloon\Contracts\Response $response
-     * @return void
      */
     public function handleResponse(Response $response): void
     {
@@ -348,7 +286,6 @@ class Limit
     /**
      * Update the limit from the store
      *
-     * @param \Saloon\RateLimiter\Contracts\RateLimiterStore $store
      * @return $this
      * @throws \JsonException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
@@ -406,8 +343,6 @@ class Limit
     /**
      * Save the limit into the store
      *
-     * @param \Saloon\RateLimiter\Contracts\RateLimiterStore $store
-     * @param int $resetHits
      * @return $this
      * @throws \JsonException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
@@ -447,8 +382,6 @@ class Limit
 
     /**
      * Get the number of requests allowed in the interval
-     *
-     * @return int
      */
     public function getAllow(): int
     {
@@ -457,8 +390,6 @@ class Limit
 
     /**
      * Get the threshold allowed in the interval
-     *
-     * @return float
      */
     public function getThreshold(): float
     {
@@ -467,9 +398,6 @@ class Limit
 
     /**
      * Set the prefix
-     *
-     * @param string $prefix
-     * @return Limit
      */
     public function setPrefix(string $prefix): Limit
     {

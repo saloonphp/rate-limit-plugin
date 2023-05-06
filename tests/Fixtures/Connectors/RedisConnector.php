@@ -23,7 +23,6 @@ final class RedisConnector extends Connector
     /**
      * Resolve the limits
      *
-     * @return array
      * @throws \Exception
      */
     protected function resolveLimits(): array
@@ -38,7 +37,6 @@ final class RedisConnector extends Connector
     /**
      * Resolve the rate limiter store to use
      *
-     * @return \Saloon\RateLimiter\Contracts\RateLimiterStore
      * @throws \RedisException
      */
     protected function resolveRateLimiterStore(): RateLimiterStore

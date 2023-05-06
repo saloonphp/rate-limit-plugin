@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Saloon\RateLimiter\Tests\Fixtures\Connectors\RedisDestructConnector;
 
 test('the connector can still be destructed properly', function () {

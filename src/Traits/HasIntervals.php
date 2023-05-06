@@ -12,23 +12,17 @@ trait HasIntervals
     /**
      * The number of seconds it will take to release the rate limit after it has
      * been reached.
-     *
-     * @var int
      */
     protected int $releaseInSeconds;
 
     /**
      * Optional time to live key to specify the time in the default key.
-     *
-     * @var string|null
      */
     protected ?string $timeToLiveKey = null;
 
     /**
      * Specify the number of seconds a limit will be released within
      *
-     * @param int $seconds
-     * @param string|null $timeToLiveKey
      * @return $this
      */
     public function everySeconds(int $seconds, ?string $timeToLiveKey = null): static
@@ -161,8 +155,6 @@ trait HasIntervals
 
     /**
      * Get the current timestamp
-     *
-     * @return int
      */
     protected function getCurrentTimestamp(): int
     {
