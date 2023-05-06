@@ -8,6 +8,7 @@ and handle what happens if a rate-limit is exceeded. This plugin allows you to d
 and a specific rate limiter stores.
 
 ### Available Stores
+
 - In-Memory (Array)
 - File
 - Redis
@@ -16,7 +17,7 @@ and a specific rate limiter stores.
 - Laravel Cache Store
 
 With this plugin, you are be able to define various limits on a per-integration basis. You can also control if Saloon
-should throw an exception or sleep if a limit is reached. Saloon will keep track of how many requests are made and 
+should throw an exception or sleep if a limit is reached. Saloon will keep track of how many requests are made and
 when a rate-limit is hit, Saloon will prevent further requests on the connector/request until the rate limit has
 been lifted.
 
@@ -44,8 +45,8 @@ class SpotifyConnector extends Connector
 }
 ```
 
-Next, you will be required to implement two methods: `resolveLimits` and `resolveRateLimiterStore`. These methods allow you to
-define the limits that Saloon will keep track of, as well as the store where the limit "hits" will be kept.
+Next, you will be required to implement two methods: `resolveLimits` and `resolveRateLimiterStore`. These methods allow
+you to define the limits that Saloon will keep track of, as well as the store where the limit "hits" will be kept.
 
 You may use the following stores depending on your application.
 
@@ -71,9 +72,11 @@ class SpotifyConnector extends Connector
 ```
 
 ## Stores
+
 These are the various stores that the rate-limiting plugin supports.
 
 ### Memory Store
+
 The simplest store. This store is persisted on the current instance of the connector/request and all information
 is lost when the connector is destructed.
 
@@ -85,7 +88,9 @@ protected function resolveRateLimiterStore(): RateLimiterStore
     return new MemoryStore;
 }
 ```
+
 ### File Store
+
 This store will use the local filesystem to store the limits. The only requirement for this store is for you
 to define the absolute path to a directory where you would like the limits to be stored.
 
@@ -99,7 +104,8 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 ```
 
 ### Redis Store
-This store will use PHP's `Redis` extension to store the limits on a Redis database. You should pass in the 
+
+This store will use PHP's `Redis` extension to store the limits on a Redis database. You should pass in the
 redis configuration into this store.
 
 ```php
@@ -116,6 +122,7 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 ```
 
 ### Predis Store
+
 Similar to the `RedisStore`, the `PredisStore` allows you to connect to Redis through the `predis/predis` PHP library.
 
 ```php
@@ -134,6 +141,7 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 ```
 
 ### PSR Cache Store
+
 This store supports any PSR-16 cache store provided by the `psr/simple-cache` library.
 
 ```php
@@ -146,6 +154,7 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 ```
 
 ### Laravel Cache Store
+
 This store can only be used in a Laravel environment, but allows you to use any of Laravel's cache disks.
 
 ```php
@@ -159,16 +168,21 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 ```
 
 ### Limits
+
 While this plugin can detect if a 429 status occurs from a response, it's better to prevent your application from
 hitting rate-limits than letting them happen. This plugin provides an expressive `Limit` class which can be used
 to define different limits. You can define as many limits as you like, with various intervals.
 
 ## Configuring Limits
-Here is a simple example of a limit for an API which only allows 60 requests per minute, but has a daily limit of 1,000 API calls.
+
+Here is a simple example of a limit for an API which only allows 60 requests per minute, but has a daily limit of 1,000
+API calls.
 There are many different limit intervals, as well as different ways you can instruct Saloon to handle the limit.
 
 ```php
-use Saloon\RateLimiter\Limit;protected function resolveLimits(): array
+use Saloon\RateLimiter\Limit;
+
+protected function resolveLimits(): array
 {
     return [
         Limit::allow(60)->everyMinute(),
@@ -178,12 +192,13 @@ use Saloon\RateLimiter\Limit;protected function resolveLimits(): array
 ```
 
 ### "429: Too Many Attempts" Detection
+
 While it's recommended that you should define your limits above, Saloon will try to catch 429 "Too Many Attempts" errors
 from an API and will automatically mark a limit as "exceeded" if it sees this. By default, Saloon will attempt to parse
-the `Retry-After` header to work out when a limit has been exceeded. If Saloon cannot calculate this, the limit will 
+the `Retry-After` header to work out when a limit has been exceeded. If Saloon cannot calculate this, the limit will
 be released after 60 seconds.
 
-You can customise this behaviour by overwriting the `handleTooManyAttempts` method. 
+You can customise this behaviour by overwriting the `handleTooManyAttempts` method.
 
 ```php
 protected function handleTooManyAttempts(Response $response, Limit $limit): void
@@ -194,7 +209,8 @@ protected function handleTooManyAttempts(Response $response, Limit $limit): void
 }
 ```
 
-Additionally, may choose to disable this functionality by adding the `protected bool $detectTooManyAttempts = false` property to your
+Additionally, may choose to disable this functionality by adding the `protected bool $detectTooManyAttempts = false`
+property to your
 connector or request which defines the trait.
 
 ```php
@@ -212,9 +228,54 @@ class SpotifyConnector extends Connector
 
 ### Limit Intervals
 
-### Custom Names
+There are various limit intervals which you can use on your limiter, ranging for seconds to up to the end of the month.
 
-### Custom Thresholds`
+```php
+use Saloon\RateLimiter\Limit;
+
+Limit::allow(60)->everySeconds(seconds: 5);
+Limit::allow(60)->everyMinute();
+Limit::allow(60)->everyFiveMinutes();
+Limit::allow(60)->everyThirtyMinutes();
+Limit::allow(60)->everyHour();
+Limit::allow(60)->everySixHours();
+Limit::allow(60)->everyTwelveHours();
+Limit::allow(60)->everyDay();
+Limit::allow(60)->everyDayUntil('8pm');
+Limit::allow(60)->untilMidnightTonight();
+Limit::allow(60)->untilEndOfMonth();
+```
+
+### Custom Names
+Sometimes you may need to add a name to your limiter. A good example of this is if you have separate API keys per-user
+and therefor require a different API rate limit per user. You can add the `name()` method to your limit to specify a 
+custom name for your limiter. Each limiter name must be unique.
+
+```php
+protected function resolveLimits(): array
+{
+    return [
+        Limit::allow(60)->everyMinute()->name('spotify-limit-user-' . $this->userId),
+    ];
+}
+```
+
+### Custom Thresholds
+You may want to specify the percentage threshold which Saloon should accept as number of "hits" on a given limit. This is
+useful if you want to stay just under the real API limit while still defining the limit in the connector/request.
+
+The threshold must be a number between 0 and 1 (e.g 0.8 = 80%)
+
+```php
+use Saloon\RateLimiter\Limit;
+
+protected function resolveLimits(): array
+{
+    return [
+        Limit::allow(60, threshold: 0.8)->everyMinute(), // Will fail when at 80% capacity
+    ];
+}
+```
 
 ## Handling Rate Limits Being Exceeded
 
@@ -229,5 +290,5 @@ class SpotifyConnector extends Connector
 ## Todo
 - [ ] Add the ability to disable automatic 429 detection
 - [ ] Better stores for Laravel's `illuminate/cache`
-- [ ] Add tests for disabling the `handleTooManyAttempts` 
+- [ ] Add tests for disabling the `handleTooManyAttempts`
 - [ ] Add tests to add `->sleep()` to the `handleTooManyAttempts` middleware
