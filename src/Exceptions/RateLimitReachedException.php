@@ -11,8 +11,6 @@ class RateLimitReachedException extends SaloonException
 {
     /**
      * Constructor
-     *
-     * @param \Saloon\RateLimiter\Limit $limit
      */
     public function __construct(readonly protected Limit $limit)
     {
@@ -21,8 +19,6 @@ class RateLimitReachedException extends SaloonException
 
     /**
      * Get the limit that was reached
-     *
-     * @return \Saloon\RateLimiter\Limit
      */
     public function getLimit(): Limit
     {

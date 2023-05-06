@@ -11,9 +11,14 @@ use Saloon\RateLimiter\Stores\RedisStore;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
-final class RedisConnector extends Connector
+final class RedisDestructConnector extends Connector
 {
     use HasRateLimiting;
+
+    public function __construct(public &$destructed = false)
+    {
+        //
+    }
 
     public function resolveBaseUrl(): string
     {
@@ -29,8 +34,6 @@ final class RedisConnector extends Connector
     {
         return [
             Limit::allow(10)->everyMinute(),
-            // Limit::allow(20)->everyHour(),
-            // Limit::allow(100)->everyDayUntil('10:30pm'),
         ];
     }
 
@@ -45,5 +48,13 @@ final class RedisConnector extends Connector
         $client->connect('127.0.0.1');
 
         return new RedisStore($client);
+    }
+
+    public function __destruct()
+    {
+        // This will test tht even with the middleware, we can still destruct the
+        // object properly.
+
+        $this->destructed = true;
     }
 }

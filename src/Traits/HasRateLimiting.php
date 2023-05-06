@@ -17,23 +17,21 @@ trait HasRateLimiting
 {
     /**
      * Is Rate limiting is enabled?
-     *
-     * @var bool
      */
     protected bool $rateLimitingEnabled = true;
 
     /**
      * The rate limiter store
-     *
-     * @var \Saloon\RateLimiter\Contracts\RateLimiterStore|null
      */
     protected ?RateLimiterStore $rateLimiterStore = null;
 
     /**
+     * Attempt to automatically detect 429 errors
+     */
+    protected bool $detectTooManyAttempts = true;
+
+    /**
      * Boot the has rate limiting trait
-     *
-     * @param \Saloon\Contracts\PendingRequest $pendingRequest
-     * @return void
      */
     public function bootHasRateLimiting(PendingRequest $pendingRequest): void
     {
@@ -52,7 +50,11 @@ trait HasRateLimiting
         }, prepend: true);
 
         $pendingRequest->middleware()->onResponse(function (Response $response) {
-            $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $this->handleTooManyAttempts(...));
+            // Todo: Refactor this
+
+            $tooManyAttemptsHandler = $this->detectTooManyAttempts === true ? $this->handleTooManyAttempts(...) : null;
+
+            $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsHandler);
             $store = $this->getRateLimiterStore();
 
             $limitThatWasExceeded = null;
@@ -97,23 +99,7 @@ trait HasRateLimiting
     }
 
     /**
-     * Resolve the limits for the rate limiter
-     *
-     * @return array<\Saloon\RateLimiter\Limit>
-     */
-    abstract protected function resolveLimits(): array;
-
-    /**
-     * Resolve the rate limit store
-     *
-     * @return RateLimiterStore
-     */
-    abstract protected function resolveRateLimiterStore(): RateLimiterStore;
-
-    /**
      * Get the prefix added to every limit
-     *
-     * @return string|null
      */
     protected function getLimiterPrefix(): ?string
     {
@@ -122,10 +108,6 @@ trait HasRateLimiting
 
     /**
      * Handle too many attempts (429) statuses
-     *
-     * @param \Saloon\Contracts\Response $response
-     * @param \Saloon\RateLimiter\Limit $limit
-     * @return void
      */
     protected function handleTooManyAttempts(Response $response, Limit $limit): void
     {
@@ -137,8 +119,6 @@ trait HasRateLimiting
     /**
      * Throw the limit exception
      *
-     * @param \Saloon\RateLimiter\Limit $limit
-     * @return void
      * @throws \Saloon\RateLimiter\Exceptions\RateLimitReachedException
      */
     protected function throwLimitException(Limit $limit): void
@@ -149,15 +129,17 @@ trait HasRateLimiting
     /**
      * Get the first limit that has exceeded
      *
-     * @param float|null $threshold
-     * @return \Saloon\RateLimiter\Limit|null
      * @throws \JsonException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
      * @throws \Exception
      */
     public function getExceededLimit(?float $threshold = null): ?Limit
     {
-        $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $this->handleTooManyAttempts(...));
+        // Todo: Refactor this
+
+        $tooManyAttemptsHandler = $this->detectTooManyAttempts === true ? $this->handleTooManyAttempts(...) : null;
+
+        $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsHandler);
 
         if (empty($limits)) {
             return null;
@@ -179,8 +161,6 @@ trait HasRateLimiting
     /**
      * Check if we have reached the rate limit
      *
-     * @param float|null $threshold
-     * @return bool
      * @throws \JsonException
      * @throws \ReflectionException
      * @throws \Saloon\RateLimiter\Exceptions\LimitException
@@ -199,7 +179,7 @@ trait HasRateLimiting
      */
     protected function handleExceededLimit(Limit $limit, PendingRequest $pendingRequest): void
     {
-        if (! $limit->shouldSleep()) {
+        if (! $limit->getShouldSleep()) {
             $this->throwLimitException($limit);
         }
 
@@ -212,7 +192,6 @@ trait HasRateLimiting
     /**
      * Enable or disable the rate limiting functionality
      *
-     * @param bool $enabled
      * @return $this
      */
     public function useRateLimiting(bool $enabled = true): static
@@ -224,11 +203,21 @@ trait HasRateLimiting
 
     /**
      * Get the rate limiter store
-     *
-     * @return \Saloon\RateLimiter\Contracts\RateLimiterStore
      */
     public function getRateLimiterStore(): RateLimiterStore
     {
         return $this->rateLimiterStore ??= $this->resolveRateLimiterStore();
     }
+
+    /**
+     * Resolve the limits for the rate limiter
+     *
+     * @return array<\Saloon\RateLimiter\Limit>
+     */
+    abstract protected function resolveLimits(): array;
+
+    /**
+     * Resolve the rate limit store
+     */
+    abstract protected function resolveRateLimiterStore(): RateLimiterStore;
 }

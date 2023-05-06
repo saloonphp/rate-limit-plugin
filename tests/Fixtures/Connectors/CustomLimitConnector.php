@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
 
-use Redis;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\Stores\RedisStore;
 use Saloon\RateLimiter\Traits\HasRateLimiting;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
-final class RedisConnector extends Connector
+final class CustomLimitConnector extends Connector
 {
     use HasRateLimiting;
+
+    public function __construct(
+        protected array $limits,
+        protected RateLimiterStore $store,
+    ) {
+        //
+    }
 
     public function resolveBaseUrl(): string
     {
@@ -27,23 +31,14 @@ final class RedisConnector extends Connector
      */
     protected function resolveLimits(): array
     {
-        return [
-            Limit::allow(10)->everyMinute(),
-            // Limit::allow(20)->everyHour(),
-            // Limit::allow(100)->everyDayUntil('10:30pm'),
-        ];
+        return $this->limits;
     }
 
     /**
      * Resolve the rate limiter store to use
-     *
-     * @throws \RedisException
      */
     protected function resolveRateLimiterStore(): RateLimiterStore
     {
-        $client = new Redis;
-        $client->connect('127.0.0.1');
-
-        return new RedisStore($client);
+        return $this->store;
     }
 }

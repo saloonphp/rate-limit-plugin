@@ -21,8 +21,6 @@ final class FileConnector extends Connector
 
     /**
      * Resolve the limits
-     *
-     * @return array
      */
     protected function resolveLimits(): array
     {
@@ -34,8 +32,6 @@ final class FileConnector extends Connector
 
     /**
      * Resolve the rate limiter store to use
-     *
-     * @return \Saloon\RateLimiter\Contracts\RateLimiterStore
      */
     protected function resolveRateLimiterStore(): RateLimiterStore
     {

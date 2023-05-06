@@ -18,11 +18,14 @@
     "require-dev": {
         "ext-redis": "*",
         "friendsofphp/php-cs-fixer": "^3.5",
-        "pestphp/pest": "^1.21",
+        "pestphp/pest": "^2.6",
         "phpstan/phpstan": "^1.9",
         "predis/predis": "^2.1",
         "psr/simple-cache": "^3.0",
-        "spatie/ray": "^1.33"
+        "spatie/ray": "^1.33",
+        "mockery/mockery": "^1.5",
+        "illuminate/cache": "^10.9",
+        "illuminate/contracts": "^10.9"
     },
     "minimum-stability": "stable",
     "autoload": {

@@ -1,45 +1,35 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Saloon\RateLimiter\Stores;
 
-use Redis;
+use Illuminate\Contracts\Cache\Store;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
-class RedisStore implements RateLimiterStore
+class LaravelCacheStore implements RateLimiterStore
 {
     /**
      * Constructor
      */
-    public function __construct(readonly protected Redis $redis)
+    public function __construct(protected Store $store)
     {
         //
     }
 
     /**
      * Get a rate limit from the store
-     *
-     * @throws \RedisException
      */
     public function get(string $key): ?string
     {
-        $data = $this->redis->get($key);
+        $data = $this->store->get($key);
 
         return is_string($data) ? $data : null;
     }
 
     /**
      * Set the rate limit into the store
-     *
-     * @throws \RedisException
      */
     public function set(string $key, string $value, int $ttl): bool
     {
-        return $this->redis->setex(
-            key: $key,
-            expire: $ttl,
-            value: $value,
-        );
+        return $this->store->put($key, $value, $ttl);
     }
 }

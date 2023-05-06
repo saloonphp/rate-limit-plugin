@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimiter\Stores;
 
-use Predis\Client;
 use Saloon\RateLimiter\Contracts\RateLimiterStore;
 
-class PredisStore implements RateLimiterStore
+class MemoryStore implements RateLimiterStore
 {
     /**
-     * Constructor
+     * Limiter Store
      */
-    public function __construct(protected Client $redis)
-    {
-        //
-    }
+    protected array $store = [];
 
     /**
      * Get a rate limit from the store
      */
     public function get(string $key): ?string
     {
-        return $this->redis->get($key);
+        return $this->store[$key] ?? null;
     }
 
     /**
@@ -30,12 +26,16 @@ class PredisStore implements RateLimiterStore
      */
     public function set(string $key, string $value, int $ttl): bool
     {
-        $status = $this->redis->setex(
-            key: $key,
-            seconds: $ttl,
-            value: $value
-        );
+        $this->store[$key] = $value;
 
-        return $status->getPayload() === 'OK';
+        return true;
+    }
+
+    /**
+     * Get the store
+     */
+    public function getStore(): array
+    {
+        return $this->store;
     }
 }

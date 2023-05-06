@@ -8,9 +8,6 @@ class RetryAfterHelper
 {
     /**
      * Parse the retry after header
-     *
-     * @param string|null $retryAfter
-     * @return int|null
      */
     public static function parse(?string $retryAfter): ?int
     {
