@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use Saloon\RateLimiter\Tests\Fixtures\Requests\UserRequest;
-use Saloon\RateLimiter\Tests\Fixtures\Connectors\RedisConnector;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\RedisConnector;
 
 test('it records and can check exceeded limits', function () {
     //

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 
 test('you can create a limiter and specify an allow and threshold', function () {
     $limiter = Limit::allow(100, 0.5)->everyMinute();

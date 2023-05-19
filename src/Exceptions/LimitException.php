@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Exceptions;
+namespace Saloon\RateLimitPlugin\Exceptions;
 
 use Saloon\Exceptions\SaloonException;
 

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
+namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 use Psr\SimpleCache\CacheInterface;
-use Saloon\RateLimiter\Stores\PsrStore;
-use Saloon\RateLimiter\Traits\HasRateLimiting;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
-use Saloon\RateLimiter\Tests\Fixtures\Helpers\ArrayPsrCache;
+use Saloon\RateLimitPlugin\Stores\PsrStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Helpers\ArrayPsrCache;
 
 final class PsrConnector extends Connector
 {

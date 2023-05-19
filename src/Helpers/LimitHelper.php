@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Helpers;
+namespace Saloon\RateLimitPlugin\Helpers;
 
 use Closure;
-use Saloon\RateLimiter\Limit;
 use Saloon\Contracts\Response;
-use Saloon\RateLimiter\Exceptions\LimitException;
+use Saloon\RateLimitPlugin\Limit;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
 
 class LimitHelper
 {

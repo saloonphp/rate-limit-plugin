@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Contracts;
+namespace Saloon\RateLimitPlugin\Contracts;
 
 interface RateLimiterStore
 {

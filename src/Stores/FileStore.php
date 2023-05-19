@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Stores;
+namespace Saloon\RateLimitPlugin\Stores;
 
 use Throwable;
 use Saloon\Helpers\Storage;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 class FileStore implements RateLimiterStore
 {

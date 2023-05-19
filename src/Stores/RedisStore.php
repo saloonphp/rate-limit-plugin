@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Stores;
+namespace Saloon\RateLimitPlugin\Stores;
 
 use Redis;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 class RedisStore implements RateLimiterStore
 {

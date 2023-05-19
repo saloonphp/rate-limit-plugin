@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Exceptions;
+namespace Saloon\RateLimitPlugin\Exceptions;
 
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 use Saloon\Exceptions\SaloonException;
 
 class RateLimitReachedException extends SaloonException

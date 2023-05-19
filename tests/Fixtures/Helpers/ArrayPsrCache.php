@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Tests\Fixtures\Helpers;
+namespace Saloon\RateLimitPlugin\Tests\Fixtures\Helpers;
 
 use Psr\SimpleCache\CacheInterface;
 

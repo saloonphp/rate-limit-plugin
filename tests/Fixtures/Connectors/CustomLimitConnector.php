@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
+namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Traits\HasRateLimiting;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 final class CustomLimitConnector extends Connector
 {

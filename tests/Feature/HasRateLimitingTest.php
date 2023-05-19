@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use Saloon\RateLimiter\Stores\MemoryStore;
-use Saloon\RateLimiter\Tests\Fixtures\Requests\UserRequest;
-use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
-use Saloon\RateLimiter\Tests\Fixtures\Connectors\WaitConnector;
-use Saloon\RateLimiter\Tests\Fixtures\Connectors\CustomLimitConnector;
-use Saloon\RateLimiter\Tests\Fixtures\Connectors\FromTooManyAttemptsConnector;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
+use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\WaitConnector;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\CustomLimitConnector;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\FromTooManyAttemptsConnector;
 
 test('when making a request with the HasRateLimiting trait added it will record the hits and throw exceptions', function () {
     $store = new MemoryStore;

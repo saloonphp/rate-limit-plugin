@@ -37,7 +37,7 @@ a different rate-limit or if you are using solo requests.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
 
 class SpotifyConnector extends Connector
 {
@@ -52,8 +52,8 @@ You may use the following stores depending on your application.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Stores\MemoryStore;
-use Saloon\RateLimiter\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
 
 class SpotifyConnector extends Connector
 {
@@ -81,7 +81,7 @@ The simplest store. This store is persisted on the current instance of the conne
 is lost when the connector is destructed.
 
 ```php
-use Saloon\RateLimiter\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
 
 protected function resolveRateLimiterStore(): RateLimiterStore
 {
@@ -95,7 +95,7 @@ This store will use the local filesystem to store the limits. The only requireme
 to define the absolute path to a directory where you would like the limits to be stored.
 
 ```php
-use Saloon\RateLimiter\Stores\FileStore;
+use Saloon\RateLimitPlugin\Stores\FileStore;
 
 protected function resolveRateLimiterStore(): RateLimiterStore
 {
@@ -110,7 +110,7 @@ redis configuration into this store.
 
 ```php
 use Redis;
-use Saloon\RateLimiter\Stores\RedisStore;
+use Saloon\RateLimitPlugin\Stores\RedisStore;
 
 protected function resolveRateLimiterStore(): RateLimiterStore
 {
@@ -126,7 +126,7 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 Similar to the `RedisStore`, the `PredisStore` allows you to connect to Redis through the `predis/predis` PHP library.
 
 ```php
-use Saloon\RateLimiter\Stores\PredisStore;
+use Saloon\RateLimitPlugin\Stores\PredisStore;
 
 protected function resolveRateLimiterStore(): RateLimiterStore
 {
@@ -145,7 +145,7 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 This store supports any PSR-16 cache store provided by the `psr/simple-cache` library.
 
 ```php
-use Saloon\RateLimiter\Stores\PsrStore;
+use Saloon\RateLimitPlugin\Stores\PsrStore;
 
 protected function resolveRateLimiterStore(): RateLimiterStore
 {
@@ -159,7 +159,7 @@ This store can only be used in a Laravel environment, but allows you to use any 
 
 ```php
 use Illuminate\Support\Facades\Cache;
-use Saloon\RateLimiter\Stores\LaravelCacheStore;
+use Saloon\RateLimitPlugin\Stores\LaravelCacheStore;
 
 protected function resolveRateLimiterStore(): RateLimiterStore
 {
@@ -180,7 +180,7 @@ API calls.
 There are many different limit intervals, as well as different ways you can instruct Saloon to handle the limit.
 
 ```php
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 
 protected function resolveLimits(): array
 {
@@ -215,8 +215,8 @@ connector or request which defines the trait.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Stores\MemoryStore;
-use Saloon\RateLimiter\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
 
 class SpotifyConnector extends Connector
 {
@@ -231,7 +231,7 @@ class SpotifyConnector extends Connector
 There are various limit intervals which you can use on your limiter, ranging for seconds to up to the end of the month.
 
 ```php
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 
 Limit::allow(60)->everySeconds(seconds: 5);
 Limit::allow(60)->everyMinute();
@@ -267,7 +267,7 @@ useful if you want to stay just under the real API limit while still defining th
 The threshold must be a number between 0 and 1 (e.g 0.8 = 80%)
 
 ```php
-use Saloon\RateLimiter\Limit;
+use Saloon\RateLimitPlugin\Limit;
 
 protected function resolveLimits(): array
 {

@@ -1,18 +1,16 @@
 <?php
 
-namespace Saloon\RateLimiter\Helpers;
+declare(strict_types=1);
+
+namespace Saloon\RateLimitPlugin\Helpers;
 
 use Closure;
-use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
+use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
 
 class LaravelRateLimitMiddleware
 {
     /**
      * Catch rate limits inside of jobs and release for the remaining seconds
-     *
-     * @param object $job
-     * @param Closure $next
-     * @return mixed
      */
     public function handle(object $job, Closure $next): mixed
     {

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Traits;
+namespace Saloon\RateLimitPlugin\Traits;
 
 use ReflectionClass;
-use Saloon\RateLimiter\Limit;
 use Saloon\Contracts\Response;
+use Saloon\RateLimitPlugin\Limit;
 use Saloon\Contracts\PendingRequest;
-use Saloon\RateLimiter\Helpers\LimitHelper;
-use Saloon\RateLimiter\Helpers\RetryAfterHelper;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
-use Saloon\RateLimiter\Exceptions\RateLimitReachedException;
+use Saloon\RateLimitPlugin\Helpers\LimitHelper;
+use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
 
 trait HasRateLimiting
 {
@@ -119,7 +119,7 @@ trait HasRateLimiting
     /**
      * Throw the limit exception
      *
-     * @throws \Saloon\RateLimiter\Exceptions\RateLimitReachedException
+     * @throws \Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException
      */
     protected function throwLimitException(Limit $limit): void
     {
@@ -130,7 +130,7 @@ trait HasRateLimiting
      * Get the first limit that has exceeded
      *
      * @throws \JsonException
-     * @throws \Saloon\RateLimiter\Exceptions\LimitException
+     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
      * @throws \Exception
      */
     public function getExceededLimit(?float $threshold = null): ?Limit
@@ -163,7 +163,7 @@ trait HasRateLimiting
      *
      * @throws \JsonException
      * @throws \ReflectionException
-     * @throws \Saloon\RateLimiter\Exceptions\LimitException
+     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
      */
     public function hasReachedRateLimit(?float $threshold = null): bool
     {
@@ -175,7 +175,7 @@ trait HasRateLimiting
      *
      * If the limit should wait, we will increment a delay - otherwise we will continue
      *
-     * @throws \Saloon\RateLimiter\Exceptions\RateLimitReachedException
+     * @throws \Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException
      */
     protected function handleExceededLimit(Limit $limit, PendingRequest $pendingRequest): void
     {
@@ -212,7 +212,7 @@ trait HasRateLimiting
     /**
      * Resolve the limits for the rate limiter
      *
-     * @return array<\Saloon\RateLimiter\Limit>
+     * @return array<\Saloon\RateLimitPlugin\Limit>
      */
     abstract protected function resolveLimits(): array;
 

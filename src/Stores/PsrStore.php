@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Stores;
+namespace Saloon\RateLimitPlugin\Stores;
 
 use Psr\SimpleCache\CacheInterface;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 class PsrStore implements RateLimiterStore
 {

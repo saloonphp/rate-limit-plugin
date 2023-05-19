@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Tests\Fixtures\Requests;
+namespace Saloon\RateLimitPlugin\Tests\Fixtures\Requests;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;

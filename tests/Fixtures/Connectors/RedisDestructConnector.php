@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Tests\Fixtures\Connectors;
+namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
 use Redis;
 use Saloon\Http\Connector;
-use Saloon\RateLimiter\Limit;
-use Saloon\RateLimiter\Stores\RedisStore;
-use Saloon\RateLimiter\Traits\HasRateLimiting;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Limit;
+use Saloon\RateLimitPlugin\Stores\RedisStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 final class RedisDestructConnector extends Connector
 {

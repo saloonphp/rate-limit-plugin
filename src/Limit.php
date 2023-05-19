@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter;
+namespace Saloon\RateLimitPlugin;
 
 use Closure;
 use Saloon\Helpers\Date;
 use InvalidArgumentException;
 use Saloon\Contracts\Response;
-use Saloon\RateLimiter\Traits\HasIntervals;
-use Saloon\RateLimiter\Exceptions\LimitException;
-use Saloon\RateLimiter\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasIntervals;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 class Limit
 {
@@ -288,7 +288,7 @@ class Limit
      *
      * @return $this
      * @throws \JsonException
-     * @throws \Saloon\RateLimiter\Exceptions\LimitException
+     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
      */
     public function update(RateLimiterStore $store): static
     {
@@ -345,7 +345,7 @@ class Limit
      *
      * @return $this
      * @throws \JsonException
-     * @throws \Saloon\RateLimiter\Exceptions\LimitException
+     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
      */
     public function save(RateLimiterStore $store, int $resetHits = 1): static
     {

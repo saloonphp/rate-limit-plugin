@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Saloon\RateLimiter\Traits;
+namespace Saloon\RateLimitPlugin\Traits;
 
 use DateTimeImmutable;
 use Saloon\Helpers\Date;
