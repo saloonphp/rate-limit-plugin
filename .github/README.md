@@ -365,7 +365,7 @@ class CustomStore implements RateLimiterStore
 ```
 
 ## Todo
-- [ ] Add the ability to disable automatic 429 detection
-- [ ] Better stores for Laravel's `illuminate/cache`
+- [x] Add the ability to disable automatic 429 detection
+- [x] Better stores for Laravel's `illuminate/cache`
 - [ ] Add tests for disabling the `handleTooManyAttempts`
 - [ ] Add tests to add `->sleep()` to the `handleTooManyAttempts` middleware
