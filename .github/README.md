@@ -30,7 +30,7 @@ composer require saloonhttp/rate-limit-plugin
 
 ## Getting Started
 
-To install the plugin, at the `HasRateLimit` trait to your connector or request. It's recommended that if you have
+To install the plugin, add the `HasRateLimit` trait to your connector or request. It's recommended that if you have
 a connector, you should put it on the connector, but it can be put on an individual request if a specific endpoint has
 a different rate-limit or if you are using solo requests.
 
@@ -240,6 +240,21 @@ protected function resolveLimits(): array
 }
 ```
 
+### Sleep
+If would rather Saloon didn't throw an exception, you can use the `sleep` method when defining a limit. When using the sleep method,
+an exception won't be thrown. Instead, Saloon will wait the remaining number of seconds before a request is attempted again.
+
+```php
+use Saloon\RateLimitPlugin\Limit;
+
+protected function resolveLimits(): array
+{
+    return [
+        Limit::allow(60)->sleep(),
+    ];
+}
+```
+
 ### "429: Too Many Attempts" Detection
 
 While it's recommended that you should define your limits above, Saloon will try to catch 429 "Too Many Attempts" errors
@@ -303,22 +318,6 @@ try {
     // shown on the front-end.
 
     return response("Too many requests to Spotify's API. Please try again in ${$seconds} seconds.");
-}
-```
-
-### Sleep
-
-If would rather Saloon didn't throw an exception, you can use the `sleep` method when defining a limit. When using the sleep method, 
-an exception won't be thrown. Instead, Saloon will wait the remaining number of seconds before a request is attempted again.
-
-```php
-use Saloon\RateLimitPlugin\Limit;
-
-protected function resolveLimits(): array
-{
-    return [
-        Limit::allow(60)->sleep(),
-    ];
 }
 ```
 
