@@ -7,7 +7,7 @@ namespace Saloon\RateLimitPlugin\Helpers;
 use Closure;
 use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
 
-class LaravelRateLimitMiddleware
+class ApiRateLimited
 {
     /**
      * Catch rate limits inside of jobs and release for the remaining seconds

@@ -279,11 +279,66 @@ protected function resolveLimits(): array
 
 ## Handling Rate Limits Being Exceeded
 
-### Laravel Job Middleware
+When a rate limit has been reached, Saloon will throw a `RateLimitReachedException`. This exception contains a `getLimit` method which 
+may be used to see the limit that has thrown the exception, but more importantly - to be able to see the number of seconds to wait
+before a request can be sent again. This can be done with a simple try-catch approach or if you are using the provided Laravel
+job middleware, then you can instruct your jobs to wait until the limit has been lifted.
 
 ### Try/Catch
 
+As mentioned above, Saloon will throw an exception if a rate limit is reached or if the API returns a 429: Too Many Requests response.
+You could use a try/catch block to catch the exception and do something with the result. For example, you may return an error to your
+users to let them know how long they need to wait - or you might retry the request later.
+
+```php
+use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
+
+$spotify = new SpotifyConnector;
+
+try {
+   $response = $spotify->send(new GetPlaylistRequest);
+} catch (RateLimitReachedException $exception) {
+    $seconds = $exception->getLimit()->getRemainingSeconds();
+    
+    // Return our users back to our application with a custom response that could be 
+    // shown on the front-end.
+
+    return response("Too many requests to Spotify's API. Please try again in ${$seconds} seconds.");
+}
+```
+
 ### Sleep
+
+If would rather Saloon didn't throw an exception, you can use the `sleep` method when defining a limit. When using the sleep method, 
+an exception won't be thrown. Instead, Saloon will wait the remaining number of seconds before a request is attempted again.
+
+```php
+use Saloon\RateLimitPlugin\Limit;
+
+protected function resolveLimits(): array
+{
+    return [
+        Limit::allow(60)->sleep(),
+    ];
+}
+```
+
+### Laravel Job Middleware
+
+If you are using Laravel, then this library comes with a [job middleware](https://laravel.com/docs/queues#job-middleware) that you can use. This job middleware will catch
+the `RateLimitReachedException` and automatically release your job back onto the queue with the remaining seconds added.
+Add this to the `middleware` method on your Laravel Job.
+
+```php
+use Saloon\RateLimitPlugin\Helpers\ApiRateLimited;
+ 
+public function middleware(): array
+{
+    return [new ApiRateLimited];
+}
+```
+> Info
+> You may also wish to increase your job's tries when using this middleware in case the job needs to be retried multiple times.
 
 ## Creating your own store
 
