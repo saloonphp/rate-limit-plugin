@@ -73,7 +73,8 @@ class SpotifyConnector extends Connector
 
 ## Stores
 
-These are the various stores that the rate-limiting plugin supports.
+These are the various stores that the rate-limiting plugin supports. You may also [create your own stores](#creating-your-own-store) if this library
+does not come with one you need.
 
 ### Memory Store
 
@@ -341,6 +342,31 @@ public function middleware(): array
 > You may also wish to increase your job's tries when using this middleware in case the job needs to be retried multiple times.
 
 ## Creating your own store
+
+You may create your own rate limit store by implementing the `RateLimiterStore` interface.
+
+```php
+use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+
+class CustomStore implements RateLimiterStore
+{
+    /**
+     * Get a rate limit from the store
+     */
+    public function get(string $key): ?string
+    {
+        //
+    }
+
+    /**
+     * Set the rate limit into the store
+     */
+    public function set(string $key, string $value, int $ttl): bool
+    {
+        //
+    }
+}
+```
 
 ## Todo
 - [ ] Add the ability to disable automatic 429 detection
