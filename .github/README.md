@@ -337,7 +337,7 @@ public function middleware(): array
     return [new ApiRateLimited];
 }
 ```
-> **Info**
+> **Note**
 > You may also wish to increase your job's tries when using this middleware in case the job needs to be retried multiple times.
 
 ## Creating your own store
