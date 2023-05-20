@@ -13,7 +13,7 @@ use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
 use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
 
-trait HasRateLimiting
+trait HasRateLimit
 {
     /**
      * Is Rate limiting is enabled?

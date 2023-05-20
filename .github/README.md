@@ -4,8 +4,7 @@
 > This plugin is still a work-in-progress. Please use with caution.
 
 Handling rate limits can be hard. This first-party plugin provides you with the tools you need to prevent rate-limits
-and handle what happens if a rate-limit is exceeded. This plugin allows you to define limits on your connector/request
-and a specific rate limiter stores.
+and handle what happens if a rate-limit is exceeded. This plugin allows you to define limits on your connector/request.
 
 ### Available Stores
 
@@ -26,38 +25,36 @@ been lifted.
 You can install this plugin via Composer.
 
 ```
-composer require sammyjo20/saloon-rate-limiter-plugin
+composer require saloonhttp/rate-limit-plugin
 ```
 
 ## Getting Started
 
-To install the plugin, at the `HasRateLimiting` trait to your connector or request. It's recommended that if you have
+To install the plugin, at the `HasRateLimit` trait to your connector or request. It's recommended that if you have
 a connector, you should put it on the connector, but it can be put on an individual request if a specific endpoint has
 a different rate-limit or if you are using solo requests.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Traits\HasRateLimit;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimiting;
+    use HasRateLimit;
 }
 ```
 
 Next, you will be required to implement two methods: `resolveLimits` and `resolveRateLimiterStore`. These methods allow
 you to define the limits that Saloon will keep track of, as well as the store where the limit "hits" will be kept.
 
-You may use the following stores depending on your application.
-
 ```php
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Traits\HasRateLimit;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimiting;
+    use HasRateLimit;
     
     protected function resolveLimits(): array
     {
@@ -73,8 +70,8 @@ class SpotifyConnector extends Connector
 
 ## Stores
 
-These are the various stores that the rate-limiting plugin supports. You may also [create your own stores](#creating-your-own-store) if this library
-does not come with one you need.
+Here are the various stores that the rate-limiting plugin supports. You may also [create your own stores](#creating-your-own-store) if this library
+does not come with one you need. Stores are used to keep track of how many requests have been sent through a given connector/request.
 
 ### Memory Store
 
@@ -177,8 +174,8 @@ to define different limits. You can define as many limits as you like, with vari
 ## Configuring Limits
 
 Here is a simple example of a limit for an API which only allows 60 requests per minute, but has a daily limit of 1,000
-API calls.
-There are many different limit intervals, as well as different ways you can instruct Saloon to handle the limit.
+API calls. There are many different limit intervals, as well as different ways you can instruct Saloon to handle the limit. There is not
+a restriction on the number of limits you can have.
 
 ```php
 use Saloon\RateLimitPlugin\Limit;
@@ -189,41 +186,6 @@ protected function resolveLimits(): array
         Limit::allow(60)->everyMinute(),
         Limit::allow(1000)->everyDay(),
     ];
-}
-```
-
-### "429: Too Many Attempts" Detection
-
-While it's recommended that you should define your limits above, Saloon will try to catch 429 "Too Many Attempts" errors
-from an API and will automatically mark a limit as "exceeded" if it sees this. By default, Saloon will attempt to parse
-the `Retry-After` header to work out when a limit has been exceeded. If Saloon cannot calculate this, the limit will
-be released after 60 seconds.
-
-You can customise this behaviour by overwriting the `handleTooManyAttempts` method.
-
-```php
-protected function handleTooManyAttempts(Response $response, Limit $limit): void
-{
-    $limit->exceeded(
-        releaseInSeconds: RetryAfterHelper::parse($response->header('Retry-After')),
-    );
-}
-```
-
-Additionally, may choose to disable this functionality by adding the `protected bool $detectTooManyAttempts = false`
-property to your
-connector or request which defines the trait.
-
-```php
-use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
-
-class SpotifyConnector extends Connector
-{
-    use HasRateLimiting;
-    
-    protected bool $detectTooManyAttempts = false;
 }
 ```
 
@@ -278,18 +240,54 @@ protected function resolveLimits(): array
 }
 ```
 
+### "429: Too Many Attempts" Detection
+
+While it's recommended that you should define your limits above, Saloon will try to catch 429 "Too Many Attempts" errors
+from an API and will automatically mark a limit as "exceeded" if it sees this status. By default, Saloon will attempt to parse
+the `Retry-After` header to work out when a limit has been exceeded. If Saloon cannot calculate this, the limit will
+be released after 60 seconds.
+
+You can customise this behaviour by overwriting the `handleTooManyAttempts` method.
+
+```php
+protected function handleTooManyAttempts(Response $response, Limit $limit): void
+{
+    $limit->exceeded(
+        releaseInSeconds: RetryAfterHelper::parse($response->header('Retry-After')),
+    );
+}
+```
+
+Additionally, may choose to disable this functionality by adding the `protected bool $detectTooManyAttempts = false`
+property to your
+connector or request which defines the trait.
+
+```php
+use Saloon\Http\Connector;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+
+class SpotifyConnector extends Connector
+{
+    use HasRateLimit;
+    
+    protected bool $detectTooManyAttempts = false;
+}
+```
+
 ## Handling Rate Limits Being Exceeded
 
 When a rate limit has been reached, Saloon will throw a `RateLimitReachedException`. This exception contains a `getLimit` method which 
-may be used to see the limit that has thrown the exception, but more importantly - to be able to see the number of seconds to wait
-before a request can be sent again. This can be done with a simple try-catch approach or if you are using the provided Laravel
-job middleware, then you can instruct your jobs to wait until the limit has been lifted.
+may be used to see the limit that has thrown the exception and see the number of seconds to wait before a request can be sent again. 
+This can be done with a simple try-catch approach or if you are using the provided Laravel job middleware, then you can instruct 
+your jobs to wait until the limit has been lifted.
 
 ### Try/Catch
 
 As mentioned above, Saloon will throw an exception if a rate limit is reached or if the API returns a 429: Too Many Requests response.
-You could use a try/catch block to catch the exception and do something with the result. For example, you may return an error to your
-users to let them know how long they need to wait - or you might retry the request later.
+You could use a try/catch block to catch the exception and do something with the limit. For example, you may return an error to your
+users to let them know how long they need to wait - or you might retry the request later. If you are using Saloon in a context of
+a queued process, then you may want to retry the queued job in the future, from the remaining seconds.
 
 ```php
 use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
@@ -327,8 +325,7 @@ protected function resolveLimits(): array
 ### Laravel Job Middleware
 
 If you are using Laravel, then this library comes with a [job middleware](https://laravel.com/docs/queues#job-middleware) that you can use. This job middleware will catch
-the `RateLimitReachedException` and automatically release your job back onto the queue with the remaining seconds added.
-Add this to the `middleware` method on your Laravel Job.
+the `RateLimitReachedException` and automatically release your job back onto the queue with the remaining seconds added. Add this to the `middleware` method on your Laravel Job.
 
 ```php
 use Saloon\RateLimitPlugin\Helpers\ApiRateLimited;

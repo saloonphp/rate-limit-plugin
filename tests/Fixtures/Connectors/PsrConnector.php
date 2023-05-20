@@ -8,13 +8,13 @@ use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
 use Psr\SimpleCache\CacheInterface;
 use Saloon\RateLimitPlugin\Stores\PsrStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Traits\HasRateLimit;
 use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Helpers\ArrayPsrCache;
 
 final class PsrConnector extends Connector
 {
-    use HasRateLimiting;
+    use HasRateLimit;
 
     public readonly CacheInterface $cache;
 

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Traits\HasRateLimit;
 use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 final class CustomLimitConnector extends Connector
 {
-    use HasRateLimiting;
+    use HasRateLimit;
 
     public function __construct(
         protected array $limits,

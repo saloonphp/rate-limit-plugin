@@ -8,12 +8,12 @@ use Redis;
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\RedisStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimiting;
+use Saloon\RateLimitPlugin\Traits\HasRateLimit;
 use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 final class RedisDestructConnector extends Connector
 {
-    use HasRateLimiting;
+    use HasRateLimit;
 
     public function __construct(public &$destructed = false)
     {
