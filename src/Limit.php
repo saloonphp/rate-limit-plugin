@@ -9,8 +9,8 @@ use Saloon\Helpers\Date;
 use InvalidArgumentException;
 use Saloon\Contracts\Response;
 use Saloon\RateLimitPlugin\Traits\HasIntervals;
-use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
 
 class Limit
 {

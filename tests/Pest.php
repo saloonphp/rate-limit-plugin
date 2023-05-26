@@ -43,9 +43,6 @@ expect()->extend('toBeOne', function () {
 
 /**
  * Parse the raw limit
- *
- * @param string|null $data
- * @return array|null
  */
 function parseRawLimit(?string $data): ?array
 {

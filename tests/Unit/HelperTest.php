@@ -13,3 +13,7 @@ test('the retry after helper can parse different values', function (string $valu
     ['Wed, 23 Oct 2030 06:28:00 GMT', fn () => 1918967280 - time()],
     ['Unknown', null],
 ]);
+
+test('the limit helper clones the limits', function () {
+    //
+});

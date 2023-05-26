@@ -7,12 +7,12 @@ namespace Saloon\RateLimitPlugin\Traits;
 use Exception;
 use ReflectionClass;
 use Saloon\Contracts\Response;
-use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\Contracts\PendingRequest;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
-use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
+use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
 
 trait HasRateLimits
@@ -51,7 +51,7 @@ trait HasRateLimits
             if ($limit instanceof Limit) {
                 $this->handleExceededLimit($limit, $pendingRequest);
             }
-        }, prepend: true);
+        }, prepend: true, name: 'rateLimitRequest');
 
         $pendingRequest->middleware()->onResponse(function (Response $response): void {
             $limitThatWasExceeded = null;
@@ -61,9 +61,7 @@ trait HasRateLimits
             // been reached. We'll increment each of the limits and continue with the
             // response.
 
-            $limits = $this->getLimits();
-
-            foreach ($limits as $limit) {
+            foreach ($this->getLimits() as $limit) {
                 // We'll update our limit from the store which should populate it with the
                 // latest timestamp and hits.
 
@@ -95,7 +93,7 @@ trait HasRateLimits
             if (isset($limitThatWasExceeded)) {
                 $this->throwLimitException($limitThatWasExceeded);
             }
-        }, prepend: true);
+        }, prepend: true, name: 'rateLimitResponse');
     }
 
     /**
@@ -207,7 +205,6 @@ trait HasRateLimits
     /**
      * Get the limits for the rate limiter store
      *
-     * @return array
      * @throws LimitException
      * @throws Exception
      */
