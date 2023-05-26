@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  tests:
+  redis-tests:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
