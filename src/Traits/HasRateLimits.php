@@ -6,7 +6,9 @@ namespace Saloon\RateLimitPlugin\Traits;
 
 use Exception;
 use ReflectionClass;
+use Saloon\Contracts\Connector;
 use Saloon\Contracts\Response;
+use Saloon\Helpers\Helpers;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\Contracts\PendingRequest;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
@@ -51,7 +53,7 @@ trait HasRateLimits
             if ($limit instanceof Limit) {
                 $this->handleExceededLimit($limit, $pendingRequest);
             }
-        }, prepend: true, name: 'rateLimitRequest');
+        }, prepend: true);
 
         $pendingRequest->middleware()->onResponse(function (Response $response): void {
             $limitThatWasExceeded = null;
@@ -93,7 +95,7 @@ trait HasRateLimits
             if (isset($limitThatWasExceeded)) {
                 $this->throwLimitException($limitThatWasExceeded);
             }
-        }, prepend: true, name: 'rateLimitResponse');
+        }, prepend: true);
     }
 
     /**
@@ -187,8 +189,6 @@ trait HasRateLimits
      */
     public function useRateLimiting(bool $enabled = true): static
     {
-        // Todo: Consider renaming method name
-
         $this->rateLimitingEnabled = $enabled;
 
         return $this;

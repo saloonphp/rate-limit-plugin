@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Helpers;
 
 use Closure;
-use Saloon\Contracts\Response;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Exceptions\LimitException;
 

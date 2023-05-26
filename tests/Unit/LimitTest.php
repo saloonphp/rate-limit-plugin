@@ -27,3 +27,7 @@ test('if the expiry timestamp is empty then the current timestamp will be used',
 test('you can get the remaining seconds left on the limiter', function () {
     //
 });
+
+test('the limit can have different intervals', function () {
+    //
+});

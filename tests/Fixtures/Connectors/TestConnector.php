@@ -8,7 +8,7 @@ use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-final class CustomLimitConnector extends Connector
+class TestConnector extends BaseConnector
 {
     use HasRateLimits;
 
@@ -17,11 +17,6 @@ final class CustomLimitConnector extends Connector
         protected array          $limits,
     ) {
         //
-    }
-
-    public function resolveBaseUrl(): string
-    {
-        return 'https://tests.saloon.dev/api';
     }
 
     /**

@@ -25,7 +25,7 @@ been lifted.
 You can install this plugin via Composer.
 
 ```
-composer require saloonhttp/rate-limit-plugin
+composer require saloonphp/rate-limit-plugin
 ```
 
 ## Getting Started
@@ -223,6 +223,17 @@ protected function resolveLimits(): array
 }
 ```
 
+### Custom Prefixes
+Saloon will append the class name of the connector or a request as the prefix to the limiter name. For example: SpotifyConnector:30_every_60. 
+You may customise the prefix by extending the `getLimiterPrefix` method on your connector or request.
+
+```php
+protected function getLimiterPrefix(): ?string
+{
+    return 'spotify-user-' . $this->userId;
+}
+```
+
 ### Custom Thresholds
 You may want to specify the percentage threshold which Saloon should accept as number of "hits" on a given limit. This is
 useful if you want to stay just under the real API limit while still defining the limit in the connector/request.
@@ -267,6 +278,10 @@ You can customise this behaviour by overwriting the `handleTooManyAttempts` meth
 ```php
 protected function handleTooManyAttempts(Response $response, Limit $limit): void
 {
+    if ($response->status() !== 429) {
+        return;
+    }
+
     $limit->exceeded(
         releaseInSeconds: RetryAfterHelper::parse($response->header('Retry-After')),
     );
