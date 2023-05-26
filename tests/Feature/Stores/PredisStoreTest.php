@@ -6,6 +6,8 @@ use Predis\Client as Predis;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\PredisStore;
 
+uses()->group('redis');
+
 test('it records and can check exceeded limits', function () {
     $predis = new Predis();
     $store = new PredisStore($predis);

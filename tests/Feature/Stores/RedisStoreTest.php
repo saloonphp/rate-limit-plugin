@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\RedisStore;
 
+uses()->group('redis');
+
 test('it records and can check exceeded limits', function () {
     $redis = new Redis;
     $redis->connect('127.0.0.1');
