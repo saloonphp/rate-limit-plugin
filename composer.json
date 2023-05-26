@@ -16,7 +16,6 @@
         "sammyjo20/saloon": "^2.6"
     },
     "require-dev": {
-        "ext-redis": "*",
         "friendsofphp/php-cs-fixer": "^3.5",
         "pestphp/pest": "^2.6",
         "phpstan/phpstan": "^1.9",
