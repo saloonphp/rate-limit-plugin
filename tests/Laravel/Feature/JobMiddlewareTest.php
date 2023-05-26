@@ -1,21 +1,19 @@
 <?php
 
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Support\Facades\Queue;
-use Saloon\Helpers\Storage;
+declare(strict_types=1);
+
+use Saloon\RateLimitPlugin\Limit;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use Saloon\RateLimitPlugin\Limit;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Queue\Events\JobProcessed;
 use Saloon\RateLimitPlugin\Stores\FileStore;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Jobs\ApiRateLimitedJob;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
-use function PHPUnit\Framework\directoryExists;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Jobs\ApiRateLimitedJob;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 
 test('the api rate limited job will release a job onto the queue if a limit is reached', function () {
-    resetTestingDirectory();
-
-    $store = new FileStore('tests/Fixtures/Temp');
+    $store = new FileStore(getTestingDirectory());
 
     $connector = new TestConnector($store, [
         Limit::allow(3)->everyMinute(),

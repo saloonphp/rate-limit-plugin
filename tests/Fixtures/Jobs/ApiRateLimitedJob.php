@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Saloon\RateLimitPlugin\Helpers\ApiRateLimited;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 
 class ApiRateLimitedJob implements ShouldQueue
 {

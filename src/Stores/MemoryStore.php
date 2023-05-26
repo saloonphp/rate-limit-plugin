@@ -10,6 +10,8 @@ class MemoryStore implements RateLimitStore
 {
     /**
      * Limiter Store
+     *
+     * @var array<string, mixed>
      */
     protected array $store = [];
 
@@ -33,6 +35,8 @@ class MemoryStore implements RateLimitStore
 
     /**
      * Get the store
+     *
+     * @return array<string, mixed>
      */
     public function getStore(): array
     {

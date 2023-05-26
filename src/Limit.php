@@ -66,13 +66,13 @@ class Limit
     protected bool $shouldSleep = false;
 
     /**
-     * Constructor
+     * @param (callable(): mixed)|null $responseHandler
      */
     final public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
     {
         $this->allow = $allow;
         $this->threshold = $threshold;
-        $this->responseHandler = $responseHandler;
+        $this->responseHandler = isset($responseHandler) ? $responseHandler(...) : null;
     }
 
     /**

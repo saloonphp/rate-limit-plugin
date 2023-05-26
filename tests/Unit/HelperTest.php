@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Saloon\RateLimitPlugin\Exceptions\LimitException;
+use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
 use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
-use Saloon\RateLimitPlugin\Limit;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
 
 test('the retry after helper can parse different values', function (?string $value, ?int $expected) {
     expect(RetryAfterHelper::parse($value))->toBe($expected);

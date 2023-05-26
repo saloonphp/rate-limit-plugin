@@ -568,7 +568,7 @@ test('it will fail if you dont configure a limiter properly', function () {
     $store = new MemoryStore;
 
     $connector = new TestConnector($store, [
-        new Limit(60)
+        new Limit(60),
     ]);
 
     $connector->withMockClient(new MockClient([

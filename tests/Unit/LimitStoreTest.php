@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 
 test('the rate limiter store instance is reused on the connector', function () {

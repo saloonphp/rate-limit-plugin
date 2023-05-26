@@ -53,10 +53,8 @@ function parseRawLimit(?string $data): ?array
 
 /**
  * Reset the testing directory
- *
- * @return void
  */
-function resetTestingDirectory(): void
+function getTestingDirectory(): string
 {
     $path = 'tests/Fixtures/Temp';
 
@@ -65,8 +63,10 @@ function resetTestingDirectory(): void
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
         }
 
-        return;
+        return $path;
     }
 
     array_map('unlink', array_filter((array) glob("${path}/*")));
+
+    return $path;
 }

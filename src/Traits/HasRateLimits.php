@@ -203,8 +203,8 @@ trait HasRateLimits
     /**
      * Get the limits for the rate limiter store
      *
+     * @return array<Limit>
      * @throws LimitException
-     * @throws Exception
      */
     public function getLimits(): array
     {
