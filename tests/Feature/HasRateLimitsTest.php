@@ -3,21 +3,21 @@
 declare(strict_types=1);
 
 use Saloon\Contracts\Response;
-use Saloon\Exceptions\Request\Statuses\InternalServerErrorException;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
+use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\LimitedRequest;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\BaseConnector;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
+use Saloon\Exceptions\Request\Statuses\InternalServerErrorException;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\LimitedSoloRequest;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\CustomPrefixConnector;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\CustomTooManyRequestsConnector;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\DisabledTooManyRequestsConnector;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\LimitedRequest;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\LimitedSoloRequest;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
-use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
-use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
 
 test('when making a request with the HasRateLimits trait added it will record the hits and throw exceptions', function () {
     $store = new MemoryStore;
@@ -460,7 +460,8 @@ test('you can specify a custom closure to determine the limiter based on respons
 });
 
 test('if a connector has the AlwaysThrowOnError trait then the limiter will take priority', function () {
-    class ThrowConnector extends TestConnector {
+    class ThrowConnector extends TestConnector
+    {
         use AlwaysThrowOnErrors;
     }
 
@@ -561,4 +562,24 @@ test('you can programmatically disable the rate limiting', function () {
     $connector->send(new UserRequest);
 
     expect($store->getStore())->toHaveCount(2);
+});
+
+test('it will fail if you dont configure a limiter properly', function () {
+    $store = new MemoryStore;
+
+    $connector = new TestConnector($store, [
+        new Limit(60)
+    ]);
+
+    $connector->withMockClient(new MockClient([
+        UserRequest::class => new MockResponse(['name' => 'Sam'], 200),
+    ]));
+
+    $connector->send(new UserRequest);
+
+    $storeData = $store->getStore();
+
+    expect($storeData)->toHaveCount(2);
+    expect($storeData)->toHaveKey('TestConnector:60_every_0');
+    expect($storeData)->toHaveKey('TestConnector:too_many_attempts_limit');
 });

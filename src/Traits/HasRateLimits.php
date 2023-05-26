@@ -6,9 +6,7 @@ namespace Saloon\RateLimitPlugin\Traits;
 
 use Exception;
 use ReflectionClass;
-use Saloon\Contracts\Connector;
 use Saloon\Contracts\Response;
-use Saloon\Helpers\Helpers;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\Contracts\PendingRequest;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;

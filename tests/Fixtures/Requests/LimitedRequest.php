@@ -6,10 +6,9 @@ namespace Saloon\RateLimitPlugin\Tests\Fixtures\Requests;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Limit;
-use Saloon\RateLimitPlugin\Stores\MemoryStore;
 use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
 final class LimitedRequest extends Request
 {
@@ -19,8 +18,7 @@ final class LimitedRequest extends Request
 
     public function __construct(
         protected RateLimitStore $store,
-    )
-    {
+    ) {
         //
     }
 

@@ -224,14 +224,6 @@ class Limit
     }
 
     /**
-     * Validate the limit
-     */
-    public function validate(): void
-    {
-        // Todo: Validate we have allow and releaseInSeconds
-    }
-
-    /**
      * Wait until the release time instead of throwing an exception
      *
      * @return $this

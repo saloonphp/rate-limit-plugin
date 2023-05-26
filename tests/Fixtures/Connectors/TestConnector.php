@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
-use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 

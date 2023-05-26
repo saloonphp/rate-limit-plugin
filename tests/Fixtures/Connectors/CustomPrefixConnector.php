@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
 class CustomPrefixConnector extends TestConnector
