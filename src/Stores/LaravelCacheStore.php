@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Stores;
 
 use Illuminate\Contracts\Cache\Store;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class LaravelCacheStore implements RateLimiterStore
+class LaravelCacheStore implements RateLimitStore
 {
     /**
      * Constructor

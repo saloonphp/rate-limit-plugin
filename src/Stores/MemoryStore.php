@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Stores;
 
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class MemoryStore implements RateLimiterStore
+class MemoryStore implements RateLimitStore
 {
     /**
      * Limiter Store

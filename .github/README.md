@@ -36,11 +36,11 @@ a different rate-limit or if you are using solo requests.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 }
 ```
 
@@ -50,11 +50,11 @@ you to define the limits that Saloon will keep track of, as well as the store wh
 ```php
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
     
     protected function resolveLimits(): array
     {
@@ -280,11 +280,11 @@ connector or request which defines the trait.
 ```php
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
     
     protected bool $detectTooManyAttempts = false;
 }
@@ -342,9 +342,9 @@ public function middleware(): array
 You may create your own rate limit store by implementing the `RateLimiterStore` interface.
 
 ```php
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class CustomStore implements RateLimiterStore
+class CustomStore implements RateLimitStore
 {
     /**
      * Get a rate limit from the store

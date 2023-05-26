@@ -1,6 +1,6 @@
 {
-    "name": "saloonhttp/rate-limit-plugin",
-    "description": "Adds support for rate limiting in your Saloon integration or SDK",
+    "name": "saloonphp/rate-limit-plugin",
+    "description": "Handle rate limits beautifully in your Saloon API integrations or SDKs",
     "license": "MIT",
     "type": "library",
     "authors": [

@@ -7,12 +7,12 @@ namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\FileStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
 final class FileConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 
     public function resolveBaseUrl(): string
     {
@@ -33,7 +33,7 @@ final class FileConnector extends Connector
     /**
      * Resolve the rate limiter store to use
      */
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
         return new FileStore('tests/Fixtures/Temp');
     }

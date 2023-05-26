@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
 use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
 final class CustomLimitConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 
     public function __construct(
-        protected array $limits,
-        protected RateLimiterStore $store,
+        protected RateLimitStore $store,
+        protected array          $limits,
     ) {
         //
     }
@@ -37,7 +37,7 @@ final class CustomLimitConnector extends Connector
     /**
      * Resolve the rate limiter store to use
      */
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
         return $this->store;
     }

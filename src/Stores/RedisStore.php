@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Stores;
 
 use Redis;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class RedisStore implements RateLimiterStore
+class RedisStore implements RateLimitStore
 {
     /**
      * Constructor

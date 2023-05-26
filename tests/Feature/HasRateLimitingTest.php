@@ -14,12 +14,16 @@ use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\FromTooManyAttemptsConnecto
 
 test('when making a request with the HasRateLimiting trait added it will record the hits and throw exceptions', function () {
     $store = new MemoryStore;
-    $connector = new CustomLimitConnector(
-        limits: [
-            Limit::allow(3)->everyMinute(),
-        ],
-        store: $store,
-    );
+
+    $connector = new CustomLimitConnector($store, [
+        Limit::allow(3)->everyMinute(),
+    ]);
+
+    $mockClient = new MockClient([
+        UserRequest::class => new MockResponse(['name' => 'Sam'], 200),
+    ]);
+
+    $connector->withMockClient($mockClient);
 
     // Let's start by making sure our store is empty
 
@@ -27,28 +31,26 @@ test('when making a request with the HasRateLimiting trait added it will record 
 
     // We'll now send four requests. The first three will be fine, the fourth should throw an exception
 
-    $currentTimestamp = time();
+    $currentTimestampPlusSixty = time() + 60;
 
     $responseA = $connector->send(new UserRequest);
     expect($responseA->status())->toBe(200);
-
-    $currentTimestampPlusSixty = $currentTimestamp + 60;
 
     // We should now have two limits for our store. We should have one for the limit we've defined
     // as well as the limit for the "too many attempts" catcher.
 
     $storeData = $store->getStore();
 
-    expect($storeData)->toHaveCount(2)
-        ->and($storeData)->toHaveKey('CustomLimitConnector:3_every_60')
-        ->and($storeData)->toHaveKey('CustomLimitConnector:too_many_attempts_limit');
+    expect($storeData)->toHaveCount(2);
+    expect($storeData)->toHaveKey('CustomLimitConnector:3_every_60');
+    expect($storeData)->toHaveKey('CustomLimitConnector:too_many_attempts_limit');
 
-    expect(json_decode($storeData['CustomLimitConnector:3_every_60'], true))->toEqual([
+    expect(parseRawLimit($storeData['CustomLimitConnector:3_every_60']))->toEqual([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(json_decode($storeData['CustomLimitConnector:too_many_attempts_limit'], true))->toEqual([
+    expect(parseRawLimit($storeData['CustomLimitConnector:too_many_attempts_limit']))->toEqual([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
@@ -61,21 +63,52 @@ test('when making a request with the HasRateLimiting trait added it will record 
 
     $storeData = $store->getStore();
 
-    dd($storeData);
-
-    expect(json_decode($storeData['CustomLimitConnector:3_every_60'], true))->toEqual([
+    expect(parseRawLimit($storeData['CustomLimitConnector:3_every_60']))->toEqual([
         'hits' => 2,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(json_decode($storeData['CustomLimitConnector:too_many_attempts_limit'], true))->toEqual([
+    expect(parseRawLimit($storeData['CustomLimitConnector:too_many_attempts_limit']))->toEqual([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    // Todo: Let's write up a test where we have a basic in-memory limit. We should limit it to 3 requests in
+    // Now let's make a third request
 
+    $responseC = $connector->send(new UserRequest);
+    expect($responseC->status())->toBe(200);
+
+    $storeData = $store->getStore();
+
+    expect(parseRawLimit($storeData['CustomLimitConnector:3_every_60']))->toEqual([
+        'hits' => 3,
+        'timestamp' => $currentTimestampPlusSixty,
+    ]);
+
+    expect(parseRawLimit($storeData['CustomLimitConnector:too_many_attempts_limit']))->toEqual([
+        'hits' => 0,
+        'allow' => 1,
+        'timestamp' => $currentTimestampPlusSixty,
+    ]);
+
+    // Finally, when we make the fourth request it should throw an exception
+
+    $thrown = false;
+
+    try {
+        $connector->send(new UserRequest);
+    } catch (RateLimitReachedException $exception) {
+        $thrown = true;
+
+        expect($exception->getMessage())->toEqual('Request Rate Limit Reached (Name: CustomLimitConnector:3_every_60)');
+        expect($exception->getLimit())->toBeInstanceOf(Limit::class);
+        expect($exception->getLimit()->getAllow())->toEqual(3);
+        expect($exception->getLimit()->getReleaseInSeconds())->toEqual(60);
+        expect($exception->getLimit()->getHits())->toEqual(3);
+    }
+
+    expect($thrown)->toBeTrue();
 });
 
 test('when making a request with the HasRateLimiting trait added it will record the hits and can sleep', function () {

@@ -8,12 +8,12 @@ use Redis;
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\RedisStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
 final class RedisDestructConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 
     public function __construct(public &$destructed = false)
     {
@@ -42,7 +42,7 @@ final class RedisDestructConnector extends Connector
      *
      * @throws \RedisException
      */
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
         $client = new Redis;
         $client->connect('127.0.0.1');

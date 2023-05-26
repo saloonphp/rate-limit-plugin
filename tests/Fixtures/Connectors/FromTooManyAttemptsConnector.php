@@ -7,13 +7,13 @@ namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\PsrStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Helpers\ArrayPsrCache;
 
 final class FromTooManyAttemptsConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 
     public readonly ArrayPsrCache $cache;
 
@@ -30,11 +30,11 @@ final class FromTooManyAttemptsConnector extends Connector
     protected function resolveLimits(): array
     {
         return [
-            Limit::fromTooManyRequests(60),
+            // Limit::fromTooManyRequests(60),
         ];
     }
 
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
         return new PsrStore($this->cache);
     }

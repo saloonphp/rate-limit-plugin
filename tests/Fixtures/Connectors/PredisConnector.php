@@ -8,12 +8,12 @@ use Predis\Client;
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\PredisStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
 final class PredisConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 
     public function resolveBaseUrl(): string
     {
@@ -34,7 +34,7 @@ final class PredisConnector extends Connector
     /**
      * Resolve the rate limiter store to use
      */
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
         return new PredisStore(new Client);
     }
