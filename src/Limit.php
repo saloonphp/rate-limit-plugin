@@ -9,8 +9,8 @@ use Saloon\Helpers\Date;
 use InvalidArgumentException;
 use Saloon\Contracts\Response;
 use Saloon\RateLimitPlugin\Traits\HasIntervals;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Exceptions\LimitException;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
 
 class Limit
 {
@@ -66,13 +66,13 @@ class Limit
     protected bool $shouldSleep = false;
 
     /**
-     * Constructor
+     * @param (callable(): mixed)|null $responseHandler
      */
     final public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
     {
         $this->allow = $allow;
         $this->threshold = $threshold;
-        $this->responseHandler = $responseHandler;
+        $this->responseHandler = isset($responseHandler) ? $responseHandler(...) : null;
     }
 
     /**
@@ -84,23 +84,11 @@ class Limit
     }
 
     /**
-     * Construct a custom "fromResponse" limier
+     * Construct a custom limier from the response
      */
-    public static function fromResponse(callable $onResponse): static
+    public static function custom(callable $responseHandler): static
     {
-        return (new static(1, 1, $onResponse(...)))->everySeconds(60, 'response');
-    }
-
-    /**
-     * Detect when the response has a status of 429 and release by the number of seconds
-     */
-    public static function fromTooManyRequests(int $releaseInSeconds): static
-    {
-        return static::fromResponse(static function (Response $response, Limit $limit) use ($releaseInSeconds) {
-            if ($response->status() === 429) {
-                $limit->exceeded($releaseInSeconds);
-            }
-        });
+        return (new static(1, 1, $responseHandler(...)))->everySeconds(60, 'custom');
     }
 
     /**
@@ -236,14 +224,6 @@ class Limit
     }
 
     /**
-     * Validate the limit
-     */
-    public function validate(): void
-    {
-        // Todo: Validate we have allow and releaseInSeconds
-    }
-
-    /**
      * Wait until the release time instead of throwing an exception
      *
      * @return $this
@@ -290,7 +270,7 @@ class Limit
      * @throws \JsonException
      * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
      */
-    public function update(RateLimiterStore $store): static
+    public function update(RateLimitStore $store): static
     {
         $storeData = $store->get($this->getName());
 
@@ -347,7 +327,7 @@ class Limit
      * @throws \JsonException
      * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
      */
-    public function save(RateLimiterStore $store, int $resetHits = 1): static
+    public function save(RateLimitStore $store, int $resetHits = 1): static
     {
         // We may attempt to save the limit just as the expiry timestamp
         // passes, so we need to check that the remaining seconds isn't

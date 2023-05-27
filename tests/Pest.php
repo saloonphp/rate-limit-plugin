@@ -13,7 +13,9 @@ declare(strict_types=1);
 |
 */
 
-// uses(Tests\TestCase::class)->in('Feature');
+use Orchestra\Testbench\TestCase as LaravelTestCase;
+
+uses(LaravelTestCase::class)->in('Laravel');
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +43,30 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function decodeStoreData(?string $data): ?array
+/**
+ * Parse the raw limit
+ */
+function parseRawLimit(?string $data): ?array
 {
-    return ! empty($data) ? json_decode($data, true, 512, JSON_THROW_ON_ERROR) : null;
+    return ! empty($data) ? json_decode($data, true) : null;
+}
+
+/**
+ * Reset the testing directory
+ */
+function getTestingDirectory(): string
+{
+    $path = 'tests/Fixtures/Temp';
+
+    if (! is_dir($path)) {
+        if (! mkdir($path) && ! is_dir($path)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+        }
+
+        return $path;
+    }
+
+    array_map('unlink', array_filter((array) glob("${path}/*")));
+
+    return $path;
 }

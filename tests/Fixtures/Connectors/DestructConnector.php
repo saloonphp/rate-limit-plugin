@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
-use Redis;
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Limit;
-use Saloon\RateLimitPlugin\Stores\RedisStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-final class RedisDestructConnector extends Connector
+final class DestructConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 
     public function __construct(public &$destructed = false)
     {
@@ -39,15 +38,10 @@ final class RedisDestructConnector extends Connector
 
     /**
      * Resolve the rate limiter store to use
-     *
-     * @throws \RedisException
      */
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
-        $client = new Redis;
-        $client->connect('127.0.0.1');
-
-        return new RedisStore($client);
+        return new MemoryStore;
     }
 
     public function __destruct()

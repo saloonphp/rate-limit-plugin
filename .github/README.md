@@ -1,7 +1,4 @@
-## Saloon Rate Limiter Plugin (Work in progress)
-
-> **Warning**
-> This plugin is still a work-in-progress. Please use with caution.
+## Saloon Rate Limit Plugin
 
 Handling rate limits can be hard. This first-party plugin provides you with the tools you need to prevent rate-limits
 and handle what happens if a rate-limit is exceeded. This plugin allows you to define limits on your connector/request.
@@ -25,7 +22,7 @@ been lifted.
 You can install this plugin via Composer.
 
 ```
-composer require saloonhttp/rate-limit-plugin
+composer require saloonphp/rate-limit-plugin
 ```
 
 ## Getting Started
@@ -36,11 +33,11 @@ a different rate-limit or if you are using solo requests.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
 }
 ```
 
@@ -50,11 +47,11 @@ you to define the limits that Saloon will keep track of, as well as the store wh
 ```php
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
     
     protected function resolveLimits(): array
     {
@@ -223,6 +220,17 @@ protected function resolveLimits(): array
 }
 ```
 
+### Custom Prefixes
+Saloon will append the class name of the connector or a request as the prefix to the limiter name. For example: SpotifyConnector:30_every_60. 
+You may customise the prefix by extending the `getLimiterPrefix` method on your connector or request.
+
+```php
+protected function getLimiterPrefix(): ?string
+{
+    return 'spotify-user-' . $this->userId;
+}
+```
+
 ### Custom Thresholds
 You may want to specify the percentage threshold which Saloon should accept as number of "hits" on a given limit. This is
 useful if you want to stay just under the real API limit while still defining the limit in the connector/request.
@@ -267,6 +275,10 @@ You can customise this behaviour by overwriting the `handleTooManyAttempts` meth
 ```php
 protected function handleTooManyAttempts(Response $response, Limit $limit): void
 {
+    if ($response->status() !== 429) {
+        return;
+    }
+
     $limit->exceeded(
         releaseInSeconds: RetryAfterHelper::parse($response->header('Retry-After')),
     );
@@ -274,17 +286,16 @@ protected function handleTooManyAttempts(Response $response, Limit $limit): void
 ```
 
 Additionally, may choose to disable this functionality by adding the `protected bool $detectTooManyAttempts = false`
-property to your
-connector or request which defines the trait.
+property to your connector or request which defines the trait.
 
 ```php
 use Saloon\Http\Connector;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Traits\HasRateLimit;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
 {
-    use HasRateLimit;
+    use HasRateLimits;
     
     protected bool $detectTooManyAttempts = false;
 }
@@ -342,9 +353,9 @@ public function middleware(): array
 You may create your own rate limit store by implementing the `RateLimiterStore` interface.
 
 ```php
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class CustomStore implements RateLimiterStore
+class CustomStore implements RateLimitStore
 {
     /**
      * Get a rate limit from the store
@@ -364,8 +375,27 @@ class CustomStore implements RateLimiterStore
 }
 ```
 
-## Todo
-- [x] Add the ability to disable automatic 429 detection
-- [x] Better stores for Laravel's `illuminate/cache`
-- [ ] Add tests for disabling the `handleTooManyAttempts`
-- [ ] Add tests to add `->sleep()` to the `handleTooManyAttempts` middleware
+## Disabling Rate Limiting
+Sometimes you might want to disable rate limiting by default or even disable it on a per-connector basis. You can either
+use a property to disable the rate limiting functionality by default, or you can use the `useRateLimitPlugin()` method
+to disable it on a per-instance basis.
+
+```php
+use Saloon\Http\Connector;
+use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Traits\HasRateLimits;
+
+class SpotifyConnector extends Connector
+{
+    use HasRateLimits;
+    
+    protected bool $rateLimitingEnabled = false;
+}
+
+// Or...
+
+$connector = new SpotifyConnector;
+$connector->useRateLimitPlugin(false);
+```
+
+

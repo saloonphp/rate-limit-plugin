@@ -6,9 +6,9 @@ namespace Saloon\RateLimitPlugin\Stores;
 
 use Throwable;
 use Saloon\Helpers\Storage;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class FileStore implements RateLimiterStore
+class FileStore implements RateLimitStore
 {
     /**
      * Storage Driver

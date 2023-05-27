@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Traits;
 
+use Exception;
 use ReflectionClass;
 use Saloon\Contracts\Response;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\Contracts\PendingRequest;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Exceptions\RateLimitReachedException;
 
-trait HasRateLimit
+trait HasRateLimits
 {
     /**
      * Is Rate limiting is enabled?
@@ -23,7 +25,7 @@ trait HasRateLimit
     /**
      * The rate limiter store
      */
-    protected ?RateLimiterStore $rateLimiterStore = null;
+    protected ?RateLimitStore $rateLimitStore = null;
 
     /**
      * Attempt to automatically detect 429 errors
@@ -33,7 +35,7 @@ trait HasRateLimit
     /**
      * Boot the has rate limiting trait
      */
-    public function bootHasRateLimiting(PendingRequest $pendingRequest): void
+    public function bootHasRateLimits(PendingRequest $pendingRequest): void
     {
         if (! $this->rateLimitingEnabled) {
             return;
@@ -43,27 +45,23 @@ trait HasRateLimit
         // exceeded any limits already. If we have, then this middleware will stop
         // the request from being processed.
 
-        $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest) {
-            if ($limit = $this->getExceededLimit()) {
+        $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest): void {
+            $limit = $this->getExceededLimit();
+
+            if ($limit instanceof Limit) {
                 $this->handleExceededLimit($limit, $pendingRequest);
             }
         }, prepend: true);
 
-        $pendingRequest->middleware()->onResponse(function (Response $response) {
-            // Todo: Refactor this
-
-            $tooManyAttemptsHandler = $this->detectTooManyAttempts === true ? $this->handleTooManyAttempts(...) : null;
-
-            $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsHandler);
-            $store = $this->getRateLimiterStore();
-
+        $pendingRequest->middleware()->onResponse(function (Response $response): void {
             $limitThatWasExceeded = null;
+            $store = $this->rateLimitStore();
 
             // First we'll iterate over every limit class, and we'll check if the limit has
             // been reached. We'll increment each of the limits and continue with the
             // response.
 
-            foreach ($limits as $limit) {
+            foreach ($this->getLimits() as $limit) {
                 // We'll update our limit from the store which should populate it with the
                 // latest timestamp and hits.
 
@@ -111,6 +109,10 @@ trait HasRateLimit
      */
     protected function handleTooManyAttempts(Response $response, Limit $limit): void
     {
+        if ($response->status() !== 429) {
+            return;
+        }
+
         $limit->exceeded(
             releaseInSeconds: RetryAfterHelper::parse($response->header('Retry-After')),
         );
@@ -130,24 +132,14 @@ trait HasRateLimit
      * Get the first limit that has exceeded
      *
      * @throws \JsonException
-     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
-     * @throws \Exception
+     * @throws LimitException
+     * @throws Exception
      */
     public function getExceededLimit(?float $threshold = null): ?Limit
     {
-        // Todo: Refactor this
+        $store = $this->rateLimitStore();
 
-        $tooManyAttemptsHandler = $this->detectTooManyAttempts === true ? $this->handleTooManyAttempts(...) : null;
-
-        $limits = LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsHandler);
-
-        if (empty($limits)) {
-            return null;
-        }
-
-        $store = $this->getRateLimiterStore();
-
-        foreach ($limits as $limit) {
+        foreach ($this->getLimits() as $limit) {
             $limit->update($store);
 
             if ($limit->hasReachedLimit($threshold)) {
@@ -162,8 +154,7 @@ trait HasRateLimit
      * Check if we have reached the rate limit
      *
      * @throws \JsonException
-     * @throws \ReflectionException
-     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
+     * @throws LimitException
      */
     public function hasReachedRateLimit(?float $threshold = null): bool
     {
@@ -194,7 +185,7 @@ trait HasRateLimit
      *
      * @return $this
      */
-    public function useRateLimiting(bool $enabled = true): static
+    public function useRateLimitPlugin(bool $enabled = true): static
     {
         $this->rateLimitingEnabled = $enabled;
 
@@ -204,9 +195,22 @@ trait HasRateLimit
     /**
      * Get the rate limiter store
      */
-    public function getRateLimiterStore(): RateLimiterStore
+    public function rateLimitStore(): RateLimitStore
     {
-        return $this->rateLimiterStore ??= $this->resolveRateLimiterStore();
+        return $this->rateLimitStore ??= $this->resolveRateLimitStore();
+    }
+
+    /**
+     * Get the limits for the rate limiter store
+     *
+     * @return array<Limit>
+     * @throws LimitException
+     */
+    public function getLimits(): array
+    {
+        $tooManyAttemptsHandler = $this->detectTooManyAttempts === true ? $this->handleTooManyAttempts(...) : null;
+
+        return LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsHandler);
     }
 
     /**
@@ -219,5 +223,5 @@ trait HasRateLimit
     /**
      * Resolve the rate limit store
      */
-    abstract protected function resolveRateLimiterStore(): RateLimiterStore;
+    abstract protected function resolveRateLimitStore(): RateLimitStore;
 }

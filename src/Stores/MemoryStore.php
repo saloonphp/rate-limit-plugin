@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Stores;
 
-use Saloon\RateLimitPlugin\Contracts\RateLimiterStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 
-class MemoryStore implements RateLimiterStore
+class MemoryStore implements RateLimitStore
 {
     /**
      * Limiter Store
+     *
+     * @var array<string, mixed>
      */
     protected array $store = [];
 
@@ -33,6 +35,8 @@ class MemoryStore implements RateLimiterStore
 
     /**
      * Get the store
+     *
+     * @return array<string, mixed>
      */
     public function getStore(): array
     {

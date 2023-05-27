@@ -15,3 +15,6 @@ parameters:
 
   paths:
   - src
+
+  ignoreErrors:
+  - '#Call to an undefined method object::release\(\).#'

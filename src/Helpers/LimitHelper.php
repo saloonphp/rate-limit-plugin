@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Helpers;
 
 use Closure;
-use Saloon\Contracts\Response;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Exceptions\LimitException;
 
@@ -20,22 +19,22 @@ class LimitHelper
      */
     public static function configureLimits(array $limits, ?string $prefix, ?Closure $tooManyAttemptsHandler = null): array
     {
-        // Todo: Refactor this - I'm not a fan of all this logic being separate
-
         // Firstly, we will clean up the limits array to only ensure the `Limit` classes
         // are being processed.
 
         $limits = array_filter($limits, static fn (mixed $value) => $value instanceof Limit);
 
+        // Now we'll make a clone of each of the limits at their empty state
+        // This is important because otherwise we'll be mutating the original
+        // objects and keep adding to the same object instances.
+
+        $limits = array_map(static fn (Limit $limit) => clone $limit, $limits);
+
         // Next we will append our "too many attempts" limit which will be used when
         // the response actually hits a 429 status.
 
         if (isset($tooManyAttemptsHandler)) {
-            $limits[] = Limit::fromResponse(static function (Response $response, Limit $limit) use ($tooManyAttemptsHandler) {
-                if ($response->status() === 429) {
-                    $tooManyAttemptsHandler($response, $limit);
-                }
-            })->name('too_many_attempts_limit');
+            $limits[] = Limit::custom($tooManyAttemptsHandler)->name('too_many_attempts_limit');
         }
 
         // Next we will set the prefix on each of the limits.

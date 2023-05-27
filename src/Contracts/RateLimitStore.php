@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Contracts;
 
-interface RateLimiterStore
+interface RateLimitStore
 {
     /**
      * Get a rate limit from the store

@@ -13,7 +13,7 @@ trait HasIntervals
      * The number of seconds it will take to release the rate limit after it has
      * been reached.
      */
-    protected int $releaseInSeconds;
+    protected int $releaseInSeconds = 0;
 
     /**
      * Optional time to live key to specify the time in the default key.
@@ -110,10 +110,10 @@ trait HasIntervals
      */
     public function untilEndOfMonth(): static
     {
-        $sundayTimestamp = (new DateTimeImmutable('last day of this month 23:59'))->getTimestamp();
+        $endOfMonthTimestamp = (new DateTimeImmutable('last day of this month 23:59'))->getTimestamp();
 
         return $this->everySeconds(
-            seconds: $sundayTimestamp - $this->getCurrentTimestamp(),
+            seconds: $endOfMonthTimestamp - $this->getCurrentTimestamp(),
             timeToLiveKey: 'end_of_month'
         );
     }

@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 use Saloon\RateLimitPlugin\Limit;
-use Saloon\RateLimitPlugin\Stores\FileStore;
+use Illuminate\Support\Facades\Cache;
+use Saloon\RateLimitPlugin\Stores\LaravelCacheStore;
 
 test('it records and can check exceeded limits', function () {
-    $directory = getTestingDirectory();
-    $store = new FileStore($directory);
+    $cache = Cache::store('array');
+    $store = new LaravelCacheStore($cache);
 
     $timestamp = time();
 
@@ -25,13 +26,13 @@ test('it records and can check exceeded limits', function () {
 
     $limit->save($store);
 
-    $rawFile = $store->get('custom:limit');
+    $rawContents = $store->get('custom:limit');
 
-    expect(file_get_contents($directory . '/' . 'custom:limit'))->toEqual($rawFile);
+    expect($cache->get('custom:limit'))->toEqual($rawContents);
 
     // Now we'll make sure the file looks correct
 
-    expect($rawFile)->toEqual(json_encode([
+    expect($rawContents)->toEqual(json_encode([
         'timestamp' => $timestamp + 60,
         'hits' => 1,
     ]));
