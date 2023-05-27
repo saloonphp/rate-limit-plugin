@@ -185,7 +185,7 @@ trait HasRateLimits
      *
      * @return $this
      */
-    public function useRateLimiting(bool $enabled = true): static
+    public function useRateLimitPlugin(bool $enabled = true): static
     {
         $this->rateLimitingEnabled = $enabled;
 

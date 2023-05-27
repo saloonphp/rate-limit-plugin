@@ -545,7 +545,7 @@ test('you can programmatically disable the rate limiting', function () {
         Limit::allow(3)->everyMinute(),
     ]);
 
-    $connector->useRateLimiting(false);
+    $connector->useRateLimitPlugin(false);
 
     $connector->withMockClient(new MockClient([
         UserRequest::class => new MockResponse(['name' => 'Sam'], 200),
@@ -557,7 +557,7 @@ test('you can programmatically disable the rate limiting', function () {
 
     expect($store->getStore())->toBeEmpty();
 
-    $connector->useRateLimiting();
+    $connector->useRateLimitPlugin();
 
     $connector->send(new UserRequest);
 
