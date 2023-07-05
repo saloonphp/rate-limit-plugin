@@ -41,11 +41,12 @@ class SpotifyConnector extends Connector
 }
 ```
 
-Next, you will be required to implement two methods: `resolveLimits` and `resolveRateLimiterStore`. These methods allow
+Next, you will be required to implement two methods: `resolveLimits` and `resolveRateLimitStore`. These methods allow
 you to define the limits that Saloon will keep track of, as well as the store where the limit "hits" will be kept.
 
 ```php
 use Saloon\Http\Connector;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
 use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
@@ -58,7 +59,7 @@ class SpotifyConnector extends Connector
         return [];
     }
 
-    protected function resolveRateLimiterStore(): RateLimiterStore
+    protected function resolveRateLimitStore(): RateLimitStore
     {
         return new MemoryStore;
     }
@@ -76,9 +77,10 @@ The simplest store. This store is persisted on the current instance of the conne
 is lost when the connector is destructed.
 
 ```php
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
 
-protected function resolveRateLimiterStore(): RateLimiterStore
+protected function resolveRateLimitStore(): RateLimitStore
 {
     return new MemoryStore;
 }
@@ -90,9 +92,10 @@ This store will use the local filesystem to store the limits. The only requireme
 to define the absolute path to a directory where you would like the limits to be stored.
 
 ```php
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\FileStore;
 
-protected function resolveRateLimiterStore(): RateLimiterStore
+protected function resolveRateLimitStore(): RateLimitStore
 {
     return new FileStore('some/application/directory');
 }
@@ -105,9 +108,10 @@ redis configuration into this store.
 
 ```php
 use Redis;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\RedisStore;
 
-protected function resolveRateLimiterStore(): RateLimiterStore
+protected function resolveRateLimitStore(): RateLimitStore
 {
     $client = new Redis;
     $client->connect('127.0.0.1');
@@ -121,9 +125,10 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 Similar to the `RedisStore`, the `PredisStore` allows you to connect to Redis through the `predis/predis` PHP library.
 
 ```php
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\PredisStore;
 
-protected function resolveRateLimiterStore(): RateLimiterStore
+protected function resolveRateLimitStore(): RateLimitStore
 {
     $client = new Predis\Client([
         'scheme' => 'tcp',
@@ -140,9 +145,10 @@ protected function resolveRateLimiterStore(): RateLimiterStore
 This store supports any PSR-16 cache store provided by the `psr/simple-cache` library.
 
 ```php
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\PsrStore;
 
-protected function resolveRateLimiterStore(): RateLimiterStore
+protected function resolveRateLimitStore(): RateLimitStore
 {
     return new PsrStore(new SomePsr16Store);
 }
@@ -154,9 +160,10 @@ This store can only be used in a Laravel environment, but allows you to use any 
 
 ```php
 use Illuminate\Support\Facades\Cache;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Stores\LaravelCacheStore;
 
-protected function resolveRateLimiterStore(): RateLimiterStore
+protected function resolveRateLimitStore(): RateLimitStore
 {
     return new LaravelCacheStore(Cache::store('redis'));
 }
@@ -350,7 +357,7 @@ public function middleware(): array
 
 ## Creating your own store
 
-You may create your own rate limit store by implementing the `RateLimiterStore` interface.
+You may create your own rate limit store by implementing the `RateLimitStore` interface.
 
 ```php
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
@@ -382,7 +389,6 @@ to disable it on a per-instance basis.
 
 ```php
 use Saloon\Http\Connector;
-use Saloon\RateLimitPlugin\Stores\MemoryStore;
 use Saloon\RateLimitPlugin\Traits\HasRateLimits;
 
 class SpotifyConnector extends Connector
@@ -397,5 +403,3 @@ class SpotifyConnector extends Connector
 $connector = new SpotifyConnector;
 $connector->useRateLimitPlugin(false);
 ```
-
-
