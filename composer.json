@@ -13,7 +13,7 @@
     "homepage": "https://github.com/sammyjo20",
     "require": {
         "php": "^8.1",
-        "sammyjo20/saloon": "^2.6"
+        "saloonphp/saloon": "^2.6"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.5",
