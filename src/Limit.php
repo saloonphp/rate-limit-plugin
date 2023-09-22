@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin;
 
 use Closure;
-use Saloon\Helpers\Date;
+use DateInterval;
+use DateTimeImmutable;
+use Saloon\Http\Response;
 use InvalidArgumentException;
-use Saloon\Contracts\Response;
 use Saloon\RateLimitPlugin\Traits\HasIntervals;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Exceptions\LimitException;
@@ -129,7 +130,13 @@ class Limit
         $this->hits = $this->allow;
 
         if (isset($releaseInSeconds)) {
-            $this->expiryTimestamp = Date::now()->addSeconds($releaseInSeconds)->toDateTime()->getTimestamp();
+            $interval = DateInterval::createFromDateString($releaseInSeconds . ' seconds');
+
+            if ($interval === false) {
+                return;
+            }
+
+            $this->expiryTimestamp = (new DateTimeImmutable)->add($interval)->getTimestamp();
         }
     }
 
@@ -170,7 +177,13 @@ class Limit
      */
     public function getExpiryTimestamp(): ?int
     {
-        return $this->expiryTimestamp ??= Date::now()->addSeconds($this->releaseInSeconds)->toDateTime()->getTimestamp();
+        $interval = DateInterval::createFromDateString($this->releaseInSeconds . ' seconds');
+
+        if ($interval === false) {
+            return 0;
+        }
+
+        return $this->expiryTimestamp ??= (new DateTimeImmutable)->add($interval)->getTimestamp();
     }
 
     /**

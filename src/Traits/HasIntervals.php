@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Saloon\RateLimitPlugin\Traits;
 
 use DateTimeImmutable;
-use Saloon\Helpers\Date;
 
 trait HasIntervals
 {
@@ -158,6 +157,6 @@ trait HasIntervals
      */
     protected function getCurrentTimestamp(): int
     {
-        return Date::now()->toDateTime()->getTimestamp();
+        return (new DateTimeImmutable)->getTimestamp();
     }
 }

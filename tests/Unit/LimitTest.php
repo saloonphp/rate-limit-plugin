@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Saloon\Helpers\Date;
 use Saloon\RateLimitPlugin\Limit;
 
 test('you can create a limiter and specify an allow and threshold', function () {
@@ -27,7 +26,7 @@ test('you can use different intervals to specify seconds', function (Limit $limi
 
 test('you can create a limiter until the end of the current month', function () {
     $endOfMonthTimestamp = (new DateTimeImmutable('last day of this month 23:59'))->getTimestamp();
-    $seconds = $endOfMonthTimestamp - Date::now()->toDateTime()->getTimestamp();
+    $seconds = $endOfMonthTimestamp - (new DateTimeImmutable)->getTimestamp();
 
     $limit = Limit::allow(60)->untilEndOfMonth();
 
@@ -36,7 +35,7 @@ test('you can create a limiter until the end of the current month', function () 
 
 test('you can create a limiter until midnight', function () {
     $tomorrowTimestamp = (new DateTimeImmutable('tomorrow'))->getTimestamp();
-    $seconds = $tomorrowTimestamp - Date::now()->toDateTime()->getTimestamp();
+    $seconds = $tomorrowTimestamp - (new DateTimeImmutable)->getTimestamp();
 
     $limit = Limit::allow(60)->untilMidnightTonight();
 
@@ -45,7 +44,7 @@ test('you can create a limiter until midnight', function () {
 
 test('you can create a limiter to release every day at a specific time', function () {
     $timestamp = (new DateTimeImmutable('01:00'))->getTimestamp();
-    $currentTimestamp = Date::now()->toDateTime()->getTimestamp();
+    $currentTimestamp = (new DateTimeImmutable)->getTimestamp();
 
     if ($timestamp < $currentTimestamp) {
         $timestamp = (new DateTimeImmutable('tomorrow 01:00'))->getTimestamp();

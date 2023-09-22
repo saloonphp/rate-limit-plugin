@@ -8,4 +8,5 @@ use Saloon\Exceptions\SaloonException;
 
 class LimitException extends SaloonException
 {
+    //
 }

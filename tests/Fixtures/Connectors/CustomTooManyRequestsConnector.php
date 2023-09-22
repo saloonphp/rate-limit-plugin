@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin\Tests\Fixtures\Connectors;
 
-use Saloon\Contracts\Response;
+use Saloon\Http\Response;
 use Saloon\RateLimitPlugin\Limit;
 
 final class CustomTooManyRequestsConnector extends TestConnector

@@ -6,9 +6,10 @@ namespace Saloon\RateLimitPlugin\Traits;
 
 use Exception;
 use ReflectionClass;
-use Saloon\Contracts\Response;
+use Saloon\Http\Response;
+use Saloon\Enums\PipeOrder;
+use Saloon\Http\PendingRequest;
 use Saloon\RateLimitPlugin\Limit;
-use Saloon\Contracts\PendingRequest;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
@@ -51,7 +52,7 @@ trait HasRateLimits
             if ($limit instanceof Limit) {
                 $this->handleExceededLimit($limit, $pendingRequest);
             }
-        }, prepend: true);
+        });
 
         $pendingRequest->middleware()->onResponse(function (Response $response): void {
             $limitThatWasExceeded = null;
@@ -93,7 +94,7 @@ trait HasRateLimits
             if (isset($limitThatWasExceeded)) {
                 $this->throwLimitException($limitThatWasExceeded);
             }
-        }, prepend: true);
+        }, order: PipeOrder::FIRST);
     }
 
     /**
