@@ -15,22 +15,7 @@ declare(strict_types=1);
 
 use Orchestra\Testbench\TestCase as LaravelTestCase;
 
-uses(LaravelTestCase::class)->in('Laravel');
-
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+uses(LaravelTestCase::class)->in('./Laravel');
 
 /*
 |--------------------------------------------------------------------------
@@ -66,7 +51,7 @@ function getTestingDirectory(): string
         return $path;
     }
 
-    array_map('unlink', array_filter((array) glob("${path}/*")));
+    array_map('unlink', array_filter((array) glob($path . '/*')));
 
     return $path;
 }
