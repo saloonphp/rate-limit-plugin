@@ -19,7 +19,7 @@ been lifted.
 You can install the cache plugin through Composer.
 
 ```
-composer require saloonphp/rate-limit-plugin "^1.0"
+composer require saloonphp/rate-limit-plugin "^2.0"
 ```
 
 ### Documentation
