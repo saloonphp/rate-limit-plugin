@@ -69,7 +69,7 @@ class Limit
     /**
      * @param (callable(): mixed)|null $responseHandler
      */
-    final public function __construct(int $allow, float $threshold = 1, callable $responseHandler = null)
+    final public function __construct(int $allow, float $threshold = 1, ?callable $responseHandler = null)
     {
         $this->allow = $allow;
         $this->threshold = $threshold;
@@ -123,7 +123,7 @@ class Limit
     /**
      * Set the limit as exceeded
      */
-    public function exceeded(int $releaseInSeconds = null): void
+    public function exceeded(?int $releaseInSeconds = null): void
     {
         $this->exceeded = true;
 
