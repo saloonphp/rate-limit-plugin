@@ -40,7 +40,7 @@ class Limit
     /**
      * The threshold that should be used when determining if a limit has been reached
      *
-     * Must be between 0 and 1. For example if you want the limiter to kick in at 85%
+     * Must be between 0 and 1. For example, if you want the limiter to kick in at 85%
      * you must set the threshold to 0.85
      */
     protected float $threshold = 1;
@@ -73,11 +73,11 @@ class Limit
     {
         $this->allow = $allow;
         $this->threshold = $threshold;
-        $this->responseHandler = isset($responseHandler) ? $responseHandler(...) : null;
+        $this->responseHandler = $responseHandler;
     }
 
     /**
-     * Construct a limiter's allow and threshold
+     * Construct a limiter's allowing and threshold
      */
     public static function allow(int $requests, float $threshold = 1): static
     {
@@ -89,7 +89,7 @@ class Limit
      */
     public static function custom(callable $responseHandler): static
     {
-        return (new static(1, 1, $responseHandler(...)))->everySeconds(60, 'custom');
+        return (new static(1, 1, $responseHandler))->everySeconds(60, 'custom');
     }
 
     /**
@@ -281,7 +281,7 @@ class Limit
      *
      * @return $this
      * @throws \JsonException
-     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
+     * @throws LimitException
      */
     public function update(RateLimitStore $store): static
     {
@@ -316,14 +316,14 @@ class Limit
             return $this;
         }
 
-        // If our expiry hasn't passed, yet then we'll set the expiry timestamp
-        // and, we'll also update the hits so the current instance has the
+        // If our expiry hasn't passed yet, then we'll set the expiry timestamp,
+        // and we'll also update the hits so the current instance has the
         // number of previous hits.
 
         $this->setExpiryTimestamp($expiry);
         $this->hit($hits);
 
-        // If this is a fromResponse limiter then we should apply the "allow" which will
+        // If this is a fromResponse limiter, then we should apply the "allow" which will
         // be useful to check if we have reached our rate limit
 
         if ($this->usesResponse()) {
@@ -338,7 +338,7 @@ class Limit
      *
      * @return $this
      * @throws \JsonException
-     * @throws \Saloon\RateLimitPlugin\Exceptions\LimitException
+     * @throws LimitException
      */
     public function save(RateLimitStore $store, int $resetHits = 1): static
     {
