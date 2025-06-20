@@ -25,7 +25,8 @@
         "mockery/mockery": "^1.5",
         "orchestra/testbench": "^8.5"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Saloon\\RateLimitPlugin\\": "src/",
