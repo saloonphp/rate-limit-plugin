@@ -25,7 +25,7 @@
         "mockery/mockery": "^1.5",
         "orchestra/testbench": "^8.5"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
