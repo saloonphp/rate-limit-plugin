@@ -26,6 +26,7 @@
         "orchestra/testbench": "^8.5"
     },
     "minimum-stability": "stable",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Saloon\\RateLimitPlugin\\": "src/",

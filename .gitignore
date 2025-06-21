@@ -14,6 +14,7 @@
 # Caches, externally stored stuff, etc
 .php-cs-fixer.cache
 .phpunit.result.cache
+.phpunit.cache
 tests/Fixtures/Saloon
 
 # environments/configs
