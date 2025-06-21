@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Saloon\RateLimitPlugin;
 
-use Closure;
 use DateInterval;
 use DateTimeImmutable;
 use Saloon\Http\Response;
