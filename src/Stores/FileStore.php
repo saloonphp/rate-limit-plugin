@@ -21,7 +21,7 @@ class FileStore implements RateLimitStore
      * @throws \Saloon\Exceptions\DirectoryNotFoundException
      * @throws \Saloon\Exceptions\UnableToCreateDirectoryException
      */
-    public function __construct(readonly protected string $directory)
+    public function __construct(protected readonly string $directory)
     {
         $this->storage = new Storage($this->directory, false);
     }

@@ -12,7 +12,7 @@ class RateLimitReachedException extends SaloonException
     /**
      * Constructor
      */
-    public function __construct(readonly protected Limit $limit)
+    public function __construct(protected readonly Limit $limit)
     {
         parent::__construct(sprintf('Request Rate Limit Reached (Name: %s)', $this->limit->getName()));
     }

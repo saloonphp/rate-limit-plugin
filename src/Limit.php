@@ -349,7 +349,13 @@ class Limit
         // reset the limit completely and hit once.
 
         if ($this->getRemainingSeconds() < 1) {
-            $this->resetLimit()->hit($resetHits);
+            // When using the fromResponse limiter, we don't need to update the hit
+            // as we only update the hit when the detect the too many attempts
+            if ($this->usesResponse()) {
+                $this->resetLimit();
+            } else {
+                $this->resetLimit()->hit($resetHits);
+            }
         }
 
         $data = [

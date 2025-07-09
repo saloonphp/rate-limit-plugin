@@ -12,7 +12,7 @@ class RedisStore implements RateLimitStore
     /**
      * Constructor
      */
-    public function __construct(readonly protected Redis $redis)
+    public function __construct(protected readonly Redis $redis)
     {
         //
     }
