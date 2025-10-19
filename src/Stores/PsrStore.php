@@ -12,7 +12,7 @@ class PsrStore implements RateLimitStore
     /**
      * Constructor
      */
-    public function __construct(readonly protected CacheInterface $cache)
+    public function __construct(protected readonly CacheInterface $cache)
     {
         //
     }
