@@ -21,9 +21,8 @@
         "phpstan/phpstan": "^1.9",
         "predis/predis": "^2.1",
         "psr/simple-cache": "^3.0",
-        "spatie/ray": "^1.33",
         "mockery/mockery": "^1.5",
-        "orchestra/testbench": "^8.5 || ^10.7"
+        "orchestra/testbench": "^9.15 || ^10.7"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
