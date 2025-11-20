@@ -12,18 +12,18 @@
     ],
     "homepage": "https://github.com/sammyjo20",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "saloonphp/saloon": "^3.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.5",
-        "pestphp/pest": "^2.6",
+        "pestphp/pest": "^v3.8.4 || ^v4.1.4",
         "phpstan/phpstan": "^1.9",
         "predis/predis": "^2.1",
         "psr/simple-cache": "^3.0",
         "spatie/ray": "^1.33",
         "mockery/mockery": "^1.5",
-        "orchestra/testbench": "^8.5"
+        "orchestra/testbench": "^8.5 || ^10.7"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
