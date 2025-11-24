@@ -32,6 +32,17 @@ class LaravelCacheStore implements RateLimitStore
      */
     public function set(string $key, string $value, int $ttl): bool
     {
-        return $this->store->put($key, $value, $ttl);
+        $result = $this->store->put($key, $value, $ttl);
+
+        // If the data already exists in the cache, then mysql returns 0 rows affected. Technically, this is not a
+        // failure. We should check for this before returning anything and return true if it does exist.
+        if ($result === false) {
+            $existingValue = $this->store->get($key);
+            if ($existingValue === $value) {
+                return true;
+            }
+        }
+
+        return $result;
     }
 }
