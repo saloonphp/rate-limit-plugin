@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Contracts\Cache\Repository;
 use Saloon\RateLimitPlugin\Limit;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
 use Saloon\RateLimitPlugin\Stores\LaravelCacheStore;
 
 test('it records and can check exceeded limits', function () {
