@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Saloon\RateLimitPlugin\Limit;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
 use Saloon\RateLimitPlugin\Stores\LaravelCacheStore;
 
 test('it records and can check exceeded limits', function () {
@@ -36,4 +37,18 @@ test('it records and can check exceeded limits', function () {
         'timestamp' => $timestamp + 60,
         'hits' => 1,
     ]));
+});
+
+test('it handles MySQL upsert behavior returning false for identical data', function () {
+    $mockCache = Mockery::mock(Repository::class);
+
+    $key = 'test:limit';
+    $value = json_encode(['timestamp' => time() + 60, 'hits' => 1]);
+
+    $mockCache->shouldReceive('put')->with($key, $value, Mockery::any())->andReturn(false);
+    $mockCache->shouldReceive('get')->with($key)->andReturn($value);
+
+    $store = new LaravelCacheStore($mockCache);
+
+    expect($store->set($key, $value, 60))->toBeTrue();
 });
