@@ -42,4 +42,12 @@ class MemoryStore implements RateLimitStore
     {
         return self::$store;
     }
+
+    /**
+     * Clear the store
+     */
+    public static function clear(): void
+    {
+        self::$store = [];
+    }
 }
