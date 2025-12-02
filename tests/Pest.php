@@ -13,8 +13,8 @@ declare(strict_types=1);
 |
 */
 
-use Orchestra\Testbench\TestCase as LaravelTestCase;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Orchestra\Testbench\TestCase as LaravelTestCase;
 
 uses(LaravelTestCase::class)
     ->beforeEach(fn () => MemoryStore::clear())
