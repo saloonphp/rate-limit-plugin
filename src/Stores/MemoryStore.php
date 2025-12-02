@@ -13,14 +13,14 @@ class MemoryStore implements RateLimitStore
      *
      * @var array<string, mixed>
      */
-    protected array $store = [];
+    protected static array $store = [];
 
     /**
      * Get a rate limit from the store
      */
     public function get(string $key): ?string
     {
-        return $this->store[$key] ?? null;
+        return self::$store[$key] ?? null;
     }
 
     /**
@@ -28,7 +28,7 @@ class MemoryStore implements RateLimitStore
      */
     public function set(string $key, string $value, int $ttl): bool
     {
-        $this->store[$key] = $value;
+        self::$store[$key] = $value;
 
         return true;
     }
@@ -40,6 +40,6 @@ class MemoryStore implements RateLimitStore
      */
     public function getStore(): array
     {
-        return $this->store;
+        return self::$store;
     }
 }
