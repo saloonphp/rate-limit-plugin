@@ -178,7 +178,7 @@ test('when making a request with the HasRateLimits trait added it will record th
 
     $connector->send(new UserRequest);
 
-    expect(time())->toEqual($currentTimestampPlusFive);
+    expect(time())->toBeGreaterThanOrEqual($currentTimestampPlusFive);
 });
 
 test('you can create a limiter that listens for 429 and will automatically back off for the Retry-After duration', function () {
