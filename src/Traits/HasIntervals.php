@@ -152,6 +152,38 @@ trait HasIntervals
         );
     }
 
+    public function untilEndOfMinute(): static
+    {
+        $now = new DateTimeImmutable;
+
+        $endOfMinuteTimestamp = $now->setTime(
+            (int) $now->format('H'),
+            (int) $now->format('i'),
+            59,
+        )->getTimestamp();
+
+        return $this->everySeconds(
+            seconds: $endOfMinuteTimestamp - $this->getCurrentTimestamp(),
+            timeToLiveKey: 'end_of_minute'
+        );
+    }
+
+    public function untilEndOfHour(): static
+    {
+        $now = new DateTimeImmutable;
+
+        $endOfHourTimestamp = $now->setTime(
+            (int) $now->format('H'),
+            59,
+            59,
+        )->getTimestamp();
+
+        return $this->everySeconds(
+            seconds: $endOfHourTimestamp - $this->getCurrentTimestamp(),
+            timeToLiveKey: 'end_of_hour'
+        );
+    }
+
     /**
      * Get the current timestamp
      */
