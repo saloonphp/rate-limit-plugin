@@ -54,7 +54,7 @@ trait HasRateLimits
             }
         });
 
-        $pendingRequest->middleware()->onResponse(function (Response $response): void {
+        $pendingRequest->middleware()->onResponse(function (Response $response): Response {
             $limitThatWasExceeded = null;
             $store = $this->rateLimitStore();
 
@@ -92,8 +92,18 @@ trait HasRateLimits
             // place. We should make sure to throw the exception here.
 
             if (isset($limitThatWasExceeded)) {
-                $this->throwLimitException($limitThatWasExceeded);
+                if (! $limit->getShouldSleep()) {
+                    $this->throwLimitException($limitThatWasExceeded);
+                }
+
+                // When the limit has been instructed to sleep() we will make the request
+                // again, which will trigger the request middleware to sleep, and then
+                // hopefully get a successful response afterward.
+
+                return $this->send($response->getRequest());
             }
+
+            return $response;
         }, order: PipeOrder::FIRST);
     }
 
@@ -103,6 +113,16 @@ trait HasRateLimits
     protected function getLimiterPrefix(): ?string
     {
         return (new ReflectionClass($this))->getShortName();
+    }
+
+    /**
+     * Define the "Too Many Attempts" (429) limiter
+     *
+     * This limiter will automatically attempt to detect 429 requests.
+     */
+    protected function getTooManyAttemptsLimiter(): ?Limit
+    {
+        return Limit::custom($this->handleTooManyAttempts(...));
     }
 
     /**
@@ -209,9 +229,9 @@ trait HasRateLimits
      */
     public function getLimits(): array
     {
-        $tooManyAttemptsHandler = $this->detectTooManyAttempts === true ? $this->handleTooManyAttempts(...) : null;
+        $tooManyAttemptsLimit = $this->detectTooManyAttempts === true ? $this->getTooManyAttemptsLimiter() : null;
 
-        return LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsHandler);
+        return LimitHelper::configureLimits($this->resolveLimits(), $this->getLimiterPrefix(), $tooManyAttemptsLimit);
     }
 
     /**
