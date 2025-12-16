@@ -7,11 +7,14 @@ namespace Saloon\RateLimitPlugin;
 use DateInterval;
 use DateTimeImmutable;
 use InvalidArgumentException;
+use Saloon\RateLimitPlugin\Traits\HasIntervals;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Exceptions\LimitException;
 
 class Bucket extends Limit
 {
+    use HasIntervals;
+
     protected float $leakRate;
     protected int $capacity;
     protected float $currentLevel = 0;
@@ -36,6 +39,8 @@ class Bucket extends Limit
 
     /**
      * Set how many tokens leak
+     *
+     * @return $this
      */
     public function leak(int $count): static
     {
@@ -47,6 +52,8 @@ class Bucket extends Limit
 
     /**
      * Set leak time period in seconds
+     *
+     * @return $this
      */
     public function every(int $seconds): static
     {
@@ -54,6 +61,16 @@ class Bucket extends Limit
         $this->recalculate();
 
         return $this;
+    }
+
+    /**
+     * Override HasIntervals trait method to work with bucket leak logic
+     *
+     * @return $this
+     */
+    public function everySeconds(int $seconds, ?string $timeToLiveKey = null): static
+    {
+        return $this->every($seconds);
     }
 
     /**

@@ -35,6 +35,24 @@ test('you can chain capacity, leak, and every methods', function () {
     expect($bucket->getLeakRate())->toEqual(5.0); // 25 tokens per 5 seconds = 5 per second
 });
 
+test('you can use everySeconds as an alias for every', function () {
+    $bucket = Bucket::capacity(60)
+        ->leak(10)
+        ->everySeconds(3);
+
+    // 10 per 3 seconds = 3.333... per second
+    expect($bucket->getLeakRate())->toBeGreaterThan(3.33);
+    expect($bucket->getLeakRate())->toBeLessThan(3.34);
+});
+
+test('everySeconds ignores the timeToLiveKey parameter for bucket', function () {
+    $bucket = Bucket::capacity(50)
+        ->leak(5)
+        ->everySeconds(2, 'ignored_key');
+
+    expect($bucket->getLeakRate())->toEqual(2.5); // 5 per 2 seconds
+});
+
 test('bucket calculates leak rate correctly', function (int $capacity, int $leakCount, int $leakSeconds, float $expectedRate) {
     $bucket = Bucket::capacity($capacity)
         ->leak($leakCount)
