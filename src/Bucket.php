@@ -41,6 +41,7 @@ class Bucket extends Limit
     {
         $this->leakCount = $count;
         $this->recalculate();
+
         return $this;
     }
 
@@ -51,23 +52,8 @@ class Bucket extends Limit
     {
         $this->leakSeconds = $seconds;
         $this->recalculate();
+
         return $this;
-    }
-
-    /**
-     * Leak per second (convenience method)
-     */
-    public function perSecond(): static
-    {
-        return $this->every(1);
-    }
-
-    /**
-     * Leak per minute (convenience method)
-     */
-    public function perMinute(): static
-    {
-        return $this->every(60);
     }
 
     /**
@@ -100,6 +86,7 @@ class Bucket extends Limit
 
         if ($this->lastLeakTimestamp === null) {
             $this->lastLeakTimestamp = $currentTimestamp;
+
             return $this;
         }
 
@@ -171,7 +158,7 @@ class Bucket extends Limit
 
         $data = json_decode($storeData, true, 512, JSON_THROW_ON_ERROR);
 
-        if (!isset($data['currentLevel'], $data['lastLeakTimestamp'])) {
+        if (! isset($data['currentLevel'], $data['lastLeakTimestamp'])) {
             throw new LimitException('Store data missing required fields: currentLevel, lastLeakTimestamp');
         }
 
@@ -216,7 +203,7 @@ class Bucket extends Limit
             ? (int)ceil($this->currentLevel / $this->leakRate) + 60
             : 60;
 
-        if (!$store->set($this->getName(), json_encode($data, JSON_THROW_ON_ERROR), $ttl)) {
+        if (! $store->set($this->getName(), json_encode($data, JSON_THROW_ON_ERROR), $ttl)) {
             throw new LimitException('Store failed to save limit data.');
         }
 
@@ -251,6 +238,7 @@ class Bucket extends Limit
     public function getCurrentLevel(): float
     {
         $this->processLeak();
+
         return $this->currentLevel;
     }
 
@@ -259,4 +247,3 @@ class Bucket extends Limit
         return $this->lastLeakTimestamp;
     }
 }
-
