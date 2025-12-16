@@ -68,3 +68,35 @@ test('you can get the remaining seconds left on the limiter', function () {
 
     expect($limit->getRemainingSeconds())->toEqual(60);
 });
+
+test('you can create a limiter until end of minute', function () {
+    $now = new DateTimeImmutable;
+
+    $endOfMinuteTimestamp = $now->setTime(
+        (int) $now->format('H'),
+        (int) $now->format('i'),
+        59,
+    )->getTimestamp();
+
+    $seconds = $endOfMinuteTimestamp - (new DateTimeImmutable)->getTimestamp();
+
+    $limit = Limit::allow(10)->untilEndOfMinute();
+
+    expect($limit->getReleaseInSeconds())->toEqual($seconds);
+});
+
+test('you can create a limiter until end of hour', function () {
+    $now = new DateTimeImmutable;
+
+    $endOfHourTimestamp = $now->setTime(
+        (int) $now->format('H'),
+        59,
+        59,
+    )->getTimestamp();
+
+    $seconds = $endOfHourTimestamp - (new DateTimeImmutable)->getTimestamp();
+
+    $limit = Limit::allow(10)->untilEndOfHour();
+
+    expect($limit->getReleaseInSeconds())->toEqual($seconds);
+});

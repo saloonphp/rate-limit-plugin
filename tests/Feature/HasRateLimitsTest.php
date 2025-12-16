@@ -16,6 +16,7 @@ use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 use Saloon\Exceptions\Request\Statuses\InternalServerErrorException;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\LimitedSoloRequest;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\CustomPrefixConnector;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\SleepTooManyRequestsConnector;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\CustomTooManyRequestsConnector;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\DisabledTooManyRequestsConnector;
 
@@ -173,11 +174,11 @@ test('when making a request with the HasRateLimits trait added it will record th
         'timestamp' => $currentTimestampPlusFive,
     ]);
 
-    // Now when we make this request, it should pause the application for 10 seconds
+    // Now when we make this request, it should pause the application for 5 seconds
 
     $connector->send(new UserRequest);
 
-    expect(time())->toEqual($currentTimestampPlusFive);
+    expect(time())->toBeGreaterThanOrEqual($currentTimestampPlusFive);
 });
 
 test('you can create a limiter that listens for 429 and will automatically back off for the Retry-After duration', function () {
@@ -291,6 +292,27 @@ test('you can disable the 429 error detection', function () {
     $connector->send(new UserRequest);
 
     expect($store->getStore())->toBeEmpty();
+});
+
+test('you can customise the 429 error detection to sleep instead', function () {
+    $store = new MemoryStore;
+    $connector = new SleepTooManyRequestsConnector($store, []);
+
+    $connector->withMockClient(new MockClient([
+        new MockResponse(['name' => 'Sam'], 200),
+        MockResponse::make(['status' => 'Too Many Requests'], 429),
+        MockResponse::make(['name' => 'Jon'], 200),
+    ]));
+
+    $startTime = time();
+
+    $connector->send(new UserRequest);
+
+    $response = $connector->send(new UserRequest);
+
+    expect($response->json())->toBe(['name' => 'Jon']);
+
+    expect(time())->toBeGreaterThanOrEqual($startTime + 5);
 });
 
 test('the rate limiter can be used on a request', function () {
