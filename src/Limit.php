@@ -130,8 +130,10 @@ class Limit
 
         $this->hits = $this->allow;
 
-        if (isset($releaseInSeconds)) {
-            $interval = DateInterval::createFromDateString($releaseInSeconds . ' seconds');
+        $seconds = $releaseInSeconds ?? $this->releaseInSeconds;
+
+        if ($seconds > 0) {
+            $interval = DateInterval::createFromDateString($seconds . ' seconds');
 
             if ($interval === false) {
                 return;
