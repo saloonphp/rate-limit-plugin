@@ -92,15 +92,18 @@ trait HasRateLimits
             // place. We should make sure to throw the exception here.
 
             if (isset($limitThatWasExceeded)) {
-                if (! $limit->getShouldSleep()) {
+                if (! $limitThatWasExceeded->getShouldSleep()) {
                     $this->throwLimitException($limitThatWasExceeded);
                 }
 
                 // When the limit has been instructed to sleep() we will make the request
                 // again, which will trigger the request middleware to sleep, and then
                 // hopefully get a successful response afterward.
+                //
+                // Always delegate to the connector: send() exists on Connector but not on Request
+                // (see saloonphp/saloon#532).
 
-                return $this->send($response->getRequest());
+                return $response->getConnector()->send($response->getRequest());
             }
 
             return $response;
