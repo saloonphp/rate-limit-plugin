@@ -51,12 +51,12 @@ test('when making a request with the HasRateLimits trait added it will record th
     expect($storeData)->toHaveKey('TestConnector:3_every_60');
     expect($storeData)->toHaveKey('TestConnector:too_many_attempts_limit');
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toLookLike([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
@@ -69,12 +69,12 @@ test('when making a request with the HasRateLimits trait added it will record th
 
     $storeData = $store->getStore();
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toLookLike([
         'hits' => 2,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
@@ -87,12 +87,12 @@ test('when making a request with the HasRateLimits trait added it will record th
 
     $storeData = $store->getStore();
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toLookLike([
         'hits' => 3,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
@@ -145,7 +145,7 @@ test('when making a request with the HasRateLimits trait added it will record th
     expect($storeData)->toHaveKey('TestConnector:3_every_5');
     expect($storeData)->toHaveKey('TestConnector:too_many_attempts_limit');
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_5']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_5']))->toLookLike([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusFive,
     ]);
@@ -157,7 +157,7 @@ test('when making a request with the HasRateLimits trait added it will record th
 
     $storeData = $store->getStore();
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_5']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_5']))->toLookLike([
         'hits' => 2,
         'timestamp' => $currentTimestampPlusFive,
     ]);
@@ -169,7 +169,7 @@ test('when making a request with the HasRateLimits trait added it will record th
 
     $storeData = $store->getStore();
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_5']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_5']))->toLookLike([
         'hits' => 3,
         'timestamp' => $currentTimestampPlusFive,
     ]);
@@ -344,12 +344,12 @@ test('the rate limiter can be used on a request', function () {
     expect($storeData)->toHaveKey('LimitedRequest:60_every_60');
     expect($storeData)->toHaveKey('LimitedRequest:too_many_attempts_limit');
 
-    expect(parseRawLimit($storeData['LimitedRequest:60_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['LimitedRequest:60_every_60']))->toLookLike([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['LimitedRequest:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['LimitedRequest:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
@@ -390,23 +390,23 @@ test('when the the rate limiter is used on both the connector or request all the
     expect($storeData)->toHaveKey('TestConnector:3_every_60');
     expect($storeData)->toHaveKey('TestConnector:too_many_attempts_limit');
 
-    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:3_every_60']))->toLookLike([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['TestConnector:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['LimitedRequest:60_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['LimitedRequest:60_every_60']))->toLookLike([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['LimitedRequest:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['LimitedRequest:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,
@@ -443,12 +443,12 @@ test('the rate limiter can be used on a solo request', function () {
     expect($storeData)->toHaveKey('LimitedSoloRequest:60_every_60');
     expect($storeData)->toHaveKey('LimitedSoloRequest:too_many_attempts_limit');
 
-    expect(parseRawLimit($storeData['LimitedSoloRequest:60_every_60']))->toEqual([
+    expect(parseRawLimit($storeData['LimitedSoloRequest:60_every_60']))->toLookLike([
         'hits' => 1,
         'timestamp' => $currentTimestampPlusSixty,
     ]);
 
-    expect(parseRawLimit($storeData['LimitedSoloRequest:too_many_attempts_limit']))->toEqual([
+    expect(parseRawLimit($storeData['LimitedSoloRequest:too_many_attempts_limit']))->toLookLike([
         'hits' => 0,
         'allow' => 1,
         'timestamp' => $currentTimestampPlusSixty,

@@ -121,7 +121,8 @@ test('exceeded with explicit releaseInSeconds uses the provided value', function
 });
 
 test('custom limiter exceeded without releaseInSeconds falls back to default 60 seconds', function () {
-    $limit = Limit::custom(function () {});
+    $limit = Limit::custom(function () {
+    });
 
     $limit->exceeded();
 

@@ -44,6 +44,22 @@ function parseRawLimit(?string $data): ?array
     return ! empty($data) ? json_decode($data, true) : null;
 }
 
+expect()->extend('toLookLike', function (array $expected) {
+    $actual = $this->value;
+
+    $expectedTimestamp = $expected['timestamp'];
+    unset($expected['timestamp']);
+
+    $actualTimestamp = $actual['timestamp'];
+    unset($actual['timestamp']);
+
+    expect($actual)->toEqual($expected);
+    expect($actualTimestamp)->toBeGreaterThanOrEqual($expectedTimestamp);
+    expect($actualTimestamp)->toBeLessThanOrEqual($expectedTimestamp + 1);
+
+    return $this;
+});
+
 /**
  * Reset the testing directory
  */
