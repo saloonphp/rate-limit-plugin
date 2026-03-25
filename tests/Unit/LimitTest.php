@@ -100,3 +100,32 @@ test('you can create a limiter until end of hour', function () {
 
     expect($limit->getReleaseInSeconds())->toEqual($seconds);
 });
+
+test('exceeded without releaseInSeconds falls back to the configured interval', function () {
+    $limit = Limit::allow(10)->everySeconds(120);
+
+    $limit->exceeded();
+
+    expect($limit->wasManuallyExceeded())->toBeTrue()
+        ->and($limit->getHits())->toBe(10)
+        ->and($limit->getRemainingSeconds())->toBe(120);
+});
+
+test('exceeded with explicit releaseInSeconds uses the provided value', function () {
+    $limit = Limit::allow(10)->everySeconds(120);
+
+    $limit->exceeded(releaseInSeconds: 300);
+
+    expect($limit->wasManuallyExceeded())->toBeTrue()
+        ->and($limit->getRemainingSeconds())->toBe(300);
+});
+
+test('custom limiter exceeded without releaseInSeconds falls back to default 60 seconds', function () {
+    $limit = Limit::custom(function () {
+    });
+
+    $limit->exceeded();
+
+    expect($limit->wasManuallyExceeded())->toBeTrue()
+        ->and($limit->getRemainingSeconds())->toBe(60);
+});
