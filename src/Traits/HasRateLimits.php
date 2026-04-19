@@ -9,6 +9,7 @@ use ReflectionClass;
 use Saloon\Http\Response;
 use Saloon\Enums\PipeOrder;
 use Saloon\Http\PendingRequest;
+use Saloon\Http\Faking\MockResponse;
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
@@ -47,6 +48,15 @@ trait HasRateLimits
         // the request from being processed.
 
         $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest): void {
+            // Skip the pre-request limit check for cache hits. Cache middleware registers
+            // with PipeOrder::FIRST, so hasFakeResponse() is already true here (null order).
+            // Plain FakeResponse = cache hit; MockResponse = mock client (should still check).
+            $fakeResponse = $pendingRequest->getFakeResponse();
+
+            if ($fakeResponse !== null && ! $fakeResponse instanceof MockResponse) {
+                return;
+            }
+
             $limit = $this->getExceededLimit();
 
             if ($limit instanceof Limit) {
@@ -55,6 +65,20 @@ trait HasRateLimits
         });
 
         $pendingRequest->middleware()->onResponse(function (Response $response): Response {
+            // Skip rate limit counting for cache hits — they never reach the API.
+            //
+            // We cannot use $response->isCached() here because the cache plugin registers
+            // setCached(true) via onResponse(PipeOrder::FIRST) during the request middleware
+            // phase, which places it *after* this handler in the pipeline (same PipeOrder,
+            // later insertion). So isCached() is always false at this point.
+            //
+            // Instead: cache hits produce a plain FakeResponse, while MockClient produces a
+            // MockResponse (extends FakeResponse) and sets isMocked() before the pipeline runs.
+            // Checking hasFakeResponse() && !isMocked() isolates cache hits only.
+            if ($response->getPendingRequest()->hasFakeResponse() && ! $response->isMocked()) {
+                return $response;
+            }
+
             $limitThatWasExceeded = null;
             $store = $this->rateLimitStore();
 
