@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 use Saloon\Enums\PipeOrder;
 use Saloon\Http\PendingRequest;
-use Saloon\Http\Faking\FakeResponse;
-use Saloon\Http\Faking\MockClient;
-use Saloon\Http\Faking\MockResponse;
 use Saloon\RateLimitPlugin\Limit;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\FakeResponse;
+use Saloon\Http\Faking\MockResponse;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
-use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Requests\UserRequest;
+use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 
 // Simulate what saloonphp/cache-plugin does: a request middleware with PipeOrder::FIRST
 // returns a plain FakeResponse (not MockResponse). This mirrors CacheMiddleware exactly —
