@@ -372,7 +372,7 @@ class Limit
         $successful = $store->set(
             key: $this->getName(),
             value: json_encode($data, JSON_THROW_ON_ERROR),
-            ttl: $this->getRemainingSeconds(),
+            ttl: max($this->getRemainingSeconds(), 1),
         );
 
         if ($successful === false) {
