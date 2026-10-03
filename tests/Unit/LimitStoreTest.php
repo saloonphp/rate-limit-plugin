@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Saloon\RateLimitPlugin\Limit;
 use Saloon\RateLimitPlugin\Stores\MemoryStore;
+use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Exceptions\LimitException;
 use Saloon\RateLimitPlugin\Tests\Fixtures\Connectors\TestConnector;
 
@@ -89,4 +90,36 @@ test('when saving the limit if the expiry time is less than a second away then t
         'timestamp' => $currentTime + 60,
         'hits' => 1,
     ]);
+});
+
+test('the limit is not saved with a non-positive ttl when the clock ticks over mid-save', function () {
+    $store = new class implements RateLimitStore {
+        public ?int $ttl = null;
+
+        public function get(string $key): ?string
+        {
+            return null;
+        }
+
+        public function set(string $key, string $value, int $ttl): bool
+        {
+            $this->ttl = $ttl;
+
+            return true;
+        }
+    };
+
+    $limit = (new class(15) extends Limit {
+        protected int $clockReads = 0;
+
+        // The tick lands between the two reads of the remaining time inside save().
+        protected function getCurrentTimestamp(): int
+        {
+            return parent::getCurrentTimestamp() + ($this->clockReads++ > 0 ? 1 : 0);
+        }
+    })->everySeconds(1)->setPrefix('custom')->name('limit');
+
+    $limit->hit()->save($store);
+
+    expect($store->ttl)->toBe(1);
 });
