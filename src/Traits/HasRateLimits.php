@@ -65,16 +65,6 @@ trait HasRateLimits
         });
 
         $pendingRequest->middleware()->onResponse(function (Response $response): Response {
-            // Skip rate limit counting for cache hits — they never reach the API.
-            //
-            // We cannot use $response->isCached() here because the cache plugin registers
-            // setCached(true) via onResponse(PipeOrder::FIRST) during the request middleware
-            // phase, which places it *after* this handler in the pipeline (same PipeOrder,
-            // later insertion). So isCached() is always false at this point.
-            //
-            // Instead: cache hits produce a plain FakeResponse, while MockClient produces a
-            // MockResponse (extends FakeResponse) and sets isMocked() before the pipeline runs.
-            // Checking hasFakeResponse() && !isMocked() isolates cache hits only.
             if ($response->getPendingRequest()->hasFakeResponse() && ! $response->isMocked()) {
                 return $response;
             }
