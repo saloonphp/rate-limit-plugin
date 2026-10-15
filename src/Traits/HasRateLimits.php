@@ -10,6 +10,7 @@ use Saloon\Http\Response;
 use Saloon\Enums\PipeOrder;
 use Saloon\Http\PendingRequest;
 use Saloon\RateLimitPlugin\Limit;
+use Saloon\Http\Faking\MockResponse;
 use Saloon\RateLimitPlugin\Helpers\LimitHelper;
 use Saloon\RateLimitPlugin\Contracts\RateLimitStore;
 use Saloon\RateLimitPlugin\Helpers\RetryAfterHelper;
@@ -47,6 +48,12 @@ trait HasRateLimits
         // the request from being processed.
 
         $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest): void {
+            $fakeResponse = $pendingRequest->getFakeResponse();
+
+            if ($fakeResponse !== null && ! $fakeResponse instanceof MockResponse) {
+                return;
+            }
+
             $limit = $this->getExceededLimit();
 
             if ($limit instanceof Limit) {
@@ -55,6 +62,10 @@ trait HasRateLimits
         });
 
         $pendingRequest->middleware()->onResponse(function (Response $response): Response {
+            if ($response->getPendingRequest()->hasFakeResponse() && ! $response->isMocked()) {
+                return $response;
+            }
+
             $limitThatWasExceeded = null;
             $store = $this->rateLimitStore();
 
