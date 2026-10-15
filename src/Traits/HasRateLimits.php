@@ -48,9 +48,6 @@ trait HasRateLimits
         // the request from being processed.
 
         $pendingRequest->middleware()->onRequest(function (PendingRequest $pendingRequest): void {
-            // Skip the pre-request limit check for cache hits. Cache middleware registers
-            // with PipeOrder::FIRST, so hasFakeResponse() is already true here (null order).
-            // Plain FakeResponse = cache hit; MockResponse = mock client (should still check).
             $fakeResponse = $pendingRequest->getFakeResponse();
 
             if ($fakeResponse !== null && ! $fakeResponse instanceof MockResponse) {
